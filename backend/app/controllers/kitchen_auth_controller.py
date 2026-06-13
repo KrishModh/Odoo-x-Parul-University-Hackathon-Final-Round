@@ -1,6 +1,7 @@
 import secrets
 import traceback
 from datetime import datetime, timezone
+
 from flask import jsonify, request
 from flask_jwt_extended import create_access_token, get_jwt_identity
 
@@ -12,7 +13,14 @@ from ..utils.validators import (
     validate_signup_payload,
     validate_verify_otp_payload,
 )
-from .auth_controller import OTP_TTL, OTP_RESEND_COOLDOWN, _build_otp, _utcnow, _resend_available_in
+from .auth_controller import (
+    OTP_RESEND_COOLDOWN,
+    OTP_TTL,
+    _build_otp,
+    _resend_available_in,
+    _utcnow,
+)
+
 
 def kitchen_signup():
     payload = request.get_json(silent=True) or {}
@@ -21,6 +29,8 @@ def kitchen_signup():
         return jsonify({'message': 'Please correct the highlighted fields.', 'errors': errors}), 422
 
     email = payload['email'].strip().lower()
+    
+    # Ensure KitchenUser.email has a DB index to prevent slow O(N) sequential scans
     existing_user = KitchenUser.query.filter_by(email=email).first()
     if existing_user:
         message = 'An account with this email already exists.'
@@ -37,13 +47,19 @@ def kitchen_signup():
             employee_code=f'KIT-{secrets.token_hex(3).upper()}'
         )
         user.set_password(payload['password'])
+        
         otp_code, otp_expiry = _build_otp()
         user.otp_code = otp_code
         user.otp_expiry = otp_expiry
         
         db.session.add(user)
-        send_otp_email(to=user.email, name=user.name, otp_code=otp_code)
+        # Commit changes to the DB first. If it fails, no useless email is sent.
         db.session.commit()
+
+        # PERFORMANCE FIX: Call external email service AFTER DB commit.
+        # Ideally, offload this to a background queue (e.g., Celery, Flask-Executor).
+        send_otp_email(to=user.email, name=user.name, otp_code=otp_code)
+
     except Exception as e:
         traceback.print_exc()
         db.session.rollback()
@@ -65,6 +81,7 @@ def kitchen_verify_otp():
 
     email = payload['email'].strip().lower()
     otp_code = payload['otp_code'].strip()
+    
     user = KitchenUser.query.filter_by(email=email).first()
 
     if not user:
@@ -117,8 +134,11 @@ def kitchen_resend_otp():
         otp_code, otp_expiry = _build_otp(now)
         user.otp_code = otp_code
         user.otp_expiry = otp_expiry
-        send_otp_email(to=user.email, name=user.name, otp_code=otp_code)
+        
         db.session.commit()
+        
+        # PERFORMANCE FIX: Send email after committing state to database
+        send_otp_email(to=user.email, name=user.name, otp_code=otp_code)
     except Exception as e:
         traceback.print_exc()
         db.session.rollback()
@@ -159,11 +179,12 @@ def kitchen_current_user():
     user = db.session.get(KitchenUser, int(get_jwt_identity()))
     if not user:
         return jsonify({'message': 'Kitchen staff account not found.'}), 404
-    data = user.to_dict()
-    return jsonify({'user': data})
+    
+    # Note: Because KitchenUser holds everything natively in its own table here,
+    # it avoids the redundant N+1 query join issue that the regular Employee model had.
+    return jsonify({'user': user.to_dict()})
 
 
 def _kitchen_auth_response(user, message):
     token = create_access_token(identity=str(user.id), additional_claims={'role': user.role})
-    data = user.to_dict()
-    return {'message': message, 'access_token': token, 'user': data}
+    return {'message': message, 'access_token': token, 'user': user.to_dict()}
