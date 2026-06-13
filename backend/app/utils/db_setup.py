@@ -67,6 +67,10 @@ def setup_database(app: Flask) -> None:
             print("Running database migrations...")
             upgrade()
             _ensure_user_auth_columns()
+            _ensure_order_payment_columns()
+            _ensure_order_customer_columns()
+            _ensure_order_kitchen_columns()
+            _ensure_order_coupon_columns()
             db.create_all()
 
             # C. Conditional Seed Data (Dev Only)
@@ -114,4 +118,102 @@ def _ensure_user_auth_columns():
 
     if statements:
         db.session.execute(text("UPDATE users SET is_verified = true WHERE role IN ('ADMIN', 'KITCHEN')"))
+        db.session.commit()
+
+
+def _ensure_order_payment_columns():
+    inspector = inspect(db.engine)
+    try:
+        columns = {column['name'] for column in inspector.get_columns('orders')}
+    except Exception:
+        return
+
+    statements = []
+    if 'payment_status' not in columns:
+        statements.append("ALTER TABLE orders ADD COLUMN payment_status VARCHAR(24) NOT NULL DEFAULT 'pending'")
+    if 'payment_id' not in columns:
+        statements.append("ALTER TABLE orders ADD COLUMN payment_id VARCHAR(120)")
+    if 'razorpay_order_id' not in columns:
+        statements.append("ALTER TABLE orders ADD COLUMN razorpay_order_id VARCHAR(120)")
+    if 'payment_method' not in columns:
+        statements.append("ALTER TABLE orders ADD COLUMN payment_method VARCHAR(24)")
+    if 'paid_at' not in columns:
+        statements.append("ALTER TABLE orders ADD COLUMN paid_at TIMESTAMP WITH TIME ZONE")
+
+    for statement in statements:
+        db.session.execute(text(statement))
+
+    if statements:
+        db.session.commit()
+
+
+def _ensure_order_customer_columns():
+    inspector = inspect(db.engine)
+    try:
+        columns = {column['name'] for column in inspector.get_columns('orders')}
+    except Exception:
+        return
+
+    statements = []
+    if 'customer_name' not in columns:
+        statements.append("ALTER TABLE orders ADD COLUMN customer_name VARCHAR(120)")
+    if 'customer_email' not in columns:
+        statements.append("ALTER TABLE orders ADD COLUMN customer_email VARCHAR(120)")
+    if 'customer_phone' not in columns:
+        statements.append("ALTER TABLE orders ADD COLUMN customer_phone VARCHAR(24)")
+    if 'invoice_sent' not in columns:
+        statements.append("ALTER TABLE orders ADD COLUMN invoice_sent BOOLEAN NOT NULL DEFAULT false")
+    if 'invoice_sent_at' not in columns:
+        statements.append("ALTER TABLE orders ADD COLUMN invoice_sent_at TIMESTAMP WITH TIME ZONE")
+
+    for statement in statements:
+        db.session.execute(text(statement))
+
+    if statements:
+        db.session.commit()
+
+
+def _ensure_order_kitchen_columns():
+    inspector = inspect(db.engine)
+    try:
+        columns = {column['name'] for column in inspector.get_columns('orders')}
+    except Exception:
+        return
+
+    statements = []
+    if 'kitchen_status' not in columns:
+        statements.append("ALTER TABLE orders ADD COLUMN kitchen_status VARCHAR(24) NOT NULL DEFAULT 'to_cook'")
+    if 'kitchen_started_at' not in columns:
+        statements.append("ALTER TABLE orders ADD COLUMN kitchen_started_at TIMESTAMP WITH TIME ZONE")
+    if 'kitchen_completed_at' not in columns:
+        statements.append("ALTER TABLE orders ADD COLUMN kitchen_completed_at TIMESTAMP WITH TIME ZONE")
+
+    for statement in statements:
+        db.session.execute(text(statement))
+
+    if statements:
+        db.session.commit()
+
+
+def _ensure_order_coupon_columns():
+    inspector = inspect(db.engine)
+    try:
+        columns = {column['name'] for column in inspector.get_columns('orders')}
+    except Exception:
+        return
+
+    statements = []
+    if 'coupon_code' not in columns:
+        statements.append("ALTER TABLE orders ADD COLUMN coupon_code VARCHAR(32)")
+    if 'discount_amount' not in columns:
+        statements.append("ALTER TABLE orders ADD COLUMN discount_amount NUMERIC(10, 2) NOT NULL DEFAULT 0.00")
+    if 'final_total' not in columns:
+        statements.append("ALTER TABLE orders ADD COLUMN final_total NUMERIC(10, 2) NOT NULL DEFAULT 0.00")
+
+    for statement in statements:
+        db.session.execute(text(statement))
+
+    if statements:
+        # Populate final_total for existing orders where it is currently 0
+        db.session.execute(text("UPDATE orders SET final_total = total WHERE final_total = 0.00"))
         db.session.commit()

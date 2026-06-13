@@ -11,3 +11,8 @@ export const createProduct = async (payload) => {
 };
 export const updateProduct = async (id, payload) => (await api.put(`/admin/products/${id}`, payload)).data;
 export const archiveProduct = async (id) => (await api.delete(`/admin/products/${id}`)).data;
+
+export const fetchCoupons = async () => (await api.get('/coupons')).data;
+export const createCoupon = async (payload) => (await api.post('/coupons/create', payload)).data;
+export const deleteCoupon = async (id) => (await api.delete(`/coupons/${id}`)).data;
+export const updateCouponStatus = async (id, is_active) => (await api.patch(`/coupons/${id}/status`, { is_active })).data;
