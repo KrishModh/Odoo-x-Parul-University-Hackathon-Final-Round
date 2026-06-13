@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, CheckCircle2, XCircle } from 'lucide-react';
 import CategorySidebar from '../../components/pos/CategorySidebar';
 import ProductCard from '../../components/pos/ProductCard';
 import TableSelector from '../../components/pos/TableSelector';
@@ -9,6 +9,9 @@ import LoadingSpinner from '../../components/LoadingSpinner';
 import { useAuth } from '../../context/useAuth';
 import POSLayout from '../../layouts/POSLayout';
 import { createOrder, fetchPosBootstrap } from '../../services/posService';
+import { createPaymentOrder, verifyPayment, processCashPayment, applyCouponCode } from '../../services/paymentService';
+import { fetchOrderStats } from '../../services/cashierService';
+import OrderHistoryModal from '../../components/pos/OrderHistoryModal';
 import { calculateCartTotals } from '../../utils/money';
 import '../../css/pos/pos.css';
 
@@ -25,8 +28,105 @@ export default function POSPage() {
   const [notice, setNotice] = useState('');
   const [error, setError] = useState('');
 
-  const totals = useMemo(() => calculateCartTotals(cart), [cart]);
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
+  const [isCouponModalOpen, setIsCouponModalOpen] = useState(false);
+  const [couponCodeInput, setCouponCodeInput] = useState('');
+  const [couponError, setCouponError] = useState('');
+  const [couponApplying, setCouponApplying] = useState(false);
+
+  const totals = useMemo(() => {
+    const baseTotals = calculateCartTotals(cart);
+    if (!appliedCoupon) return baseTotals;
+
+    const subtotal = baseTotals.subtotal;
+    // Check if subtotal is below minimum order amount required by coupon
+    if (subtotal < appliedCoupon.min_order_amount) {
+      return {
+        ...baseTotals,
+        discount_amount: 0,
+        final_total: baseTotals.total,
+        coupon_error: `Min order ₹${appliedCoupon.min_order_amount} required`
+      };
+    }
+
+    let discount_amount = 0;
+    if (appliedCoupon.discount_type === 'percentage') {
+      discount_amount = parseFloat((subtotal * (appliedCoupon.discount_value / 100)).toFixed(2));
+    } else {
+      discount_amount = parseFloat(appliedCoupon.discount_value);
+    }
+
+    if (discount_amount > subtotal) {
+      discount_amount = subtotal;
+    }
+
+    const gst = parseFloat(((subtotal - discount_amount) * 0.05).toFixed(2));
+    const final_total = parseFloat((subtotal - discount_amount + gst).toFixed(2));
+
+    return {
+      ...baseTotals,
+      discount_amount,
+      gst,
+      final_total
+    };
+  }, [cart, appliedCoupon]);
+
   const filteredProducts = useMemo(() => activeCategory === 'all' ? products : products.filter((product) => product.category === activeCategory), [activeCategory, products]);
+
+  const [stats, setStats] = useState(null);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [checkoutResetKey, setCheckoutResetKey] = useState(0);
+
+  const resetCheckoutFlow = () => {
+    setCart([]);
+    setSelectedTable(null);
+    setCheckoutResetKey((prev) => prev + 1);
+    setNotice('');
+    setError('');
+    setPaymentError('');
+    setAppliedCoupon(null);
+  };
+
+  const handleApplyCoupon = async (e) => {
+    e.preventDefault();
+    if (!couponCodeInput.trim()) return;
+    setCouponApplying(true);
+    setCouponError('');
+    try {
+      const res = await applyCouponCode({
+        code: couponCodeInput.trim(),
+        subtotal: totals.subtotal
+      });
+      setAppliedCoupon({
+        code: res.data.code,
+        discount_type: res.data.discount_type,
+        discount_value: res.data.discount_value,
+        discount_amount: res.data.discount_amount,
+        min_order_amount: res.data.min_order_amount || 0
+      });
+      setIsCouponModalOpen(false);
+      setCouponCodeInput('');
+      setNotice(`Coupon "${res.data.code}" applied successfully!`);
+    } catch (err) {
+      setCouponError(err.response?.data?.message || 'Invalid coupon code.');
+    } finally {
+      setCouponApplying(false);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setNotice('Coupon removed.');
+  };
+
+  const loadStats = async () => {
+    try {
+      const statsData = await fetchOrderStats();
+      setStats(statsData.data);
+    } catch (e) {
+      console.error('Failed to load order stats for badges:', e);
+    }
+  };
 
   const loadPos = async () => {
     setLoading(true);
@@ -37,6 +137,7 @@ export default function POSPage() {
       setCategories(data.categories);
       setProducts(data.products);
       setSelectedTable((current) => current || data.tables[0] || null);
+      await loadStats();
     } catch (requestError) {
       setError(requestError.response?.data?.message || 'Unable to load POS session.');
     } finally {
@@ -82,13 +183,123 @@ export default function POSPage() {
     }
   };
 
+  const [paymentState, setPaymentState] = useState('idle');
+  const [paymentError, setPaymentError] = useState('');
+
+  const handlePayment = async (method, customerDetails) => {
+    if (!selectedTable) {
+      setNotice('Select a table before initiating payment.');
+      return;
+    }
+    if (!cart.length) {
+      setNotice('Cart is empty. Add items to cart before initiating payment.');
+      return;
+    }
+
+    // Double check coupon min order requirements before submitting
+    if (appliedCoupon && totals.coupon_error) {
+      setNotice(totals.coupon_error);
+      return;
+    }
+
+    setNotice('');
+    setError('');
+    setPaymentError('');
+    setPaymentState('creating');
+
+    if (method === 'cash') {
+      try {
+        await processCashPayment({
+          table_id: selectedTable.id,
+          items: cart.map((item) => ({ product_id: item.id, quantity: item.quantity })),
+          customer_name: customerDetails.name,
+          customer_email: customerDetails.email,
+          customer_phone: customerDetails.phone,
+          coupon_code: appliedCoupon ? appliedCoupon.code : null
+        });
+
+        setPaymentState('success');
+        resetCheckoutFlow();
+        loadStats();
+        setTimeout(() => {
+          setPaymentState('idle');
+        }, 2000);
+      } catch (requestError) {
+        setPaymentError(requestError.response?.data?.message || 'Failed to process cash payment.');
+        setPaymentState('failed');
+      }
+    } else {
+      try {
+        const data = await createPaymentOrder({
+          table_id: selectedTable.id,
+          items: cart.map((item) => ({ product_id: item.id, quantity: item.quantity })),
+          customer_name: customerDetails.name,
+          customer_email: customerDetails.email,
+          customer_phone: customerDetails.phone,
+          coupon_code: appliedCoupon ? appliedCoupon.code : null
+        });
+
+        setPaymentState('checkout');
+
+        const options = {
+          key: import.meta.env.VITE_RAZORPAY_KEY || data.razorpay_key,
+          amount: data.amount,
+          currency: data.currency,
+          name: 'Velluto Cafe',
+          description: `Table ${selectedTable.name} Order Payment (ONLINE)`,
+          image: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=100&h=100&q=80',
+          order_id: data.order_id,
+          handler: async (response) => {
+            setPaymentState('verifying');
+            try {
+              await verifyPayment({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature
+              });
+              setPaymentState('success');
+              resetCheckoutFlow();
+              loadStats();
+              setTimeout(() => {
+                setPaymentState('idle');
+              }, 2000);
+            } catch (verifyError) {
+              setPaymentError(verifyError.response?.data?.message || 'Payment signature verification failed.');
+              setPaymentState('failed');
+            }
+          },
+          prefill: {
+            name: customerDetails.name || user?.name || 'Cashier',
+            email: customerDetails.email || user?.email || 'cashier@velluto.com',
+            contact: customerDetails.phone || '',
+          },
+          theme: {
+            color: '#49352a',
+          },
+          modal: {
+            ondismiss: () => {
+              setPaymentState('idle');
+            }
+          }
+        };
+
+        const rzp = new window.Razorpay(options);
+        rzp.open();
+
+      } catch (requestError) {
+        setPaymentError(requestError.response?.data?.message || 'Failed to initialize payment.');
+        setPaymentState('failed');
+      }
+    }
+  };
+
   const handleLogout = () => {
     logout();
     window.location.assign('/login');
   };
 
   return (
-    <POSLayout selectedTable={selectedTable} user={user} onLogout={handleLogout}>
+    <POSLayout selectedTable={selectedTable} user={user} onLogout={handleLogout} stats={stats} onOpenHistory={() => setIsHistoryOpen(true)}>
       <main className="pos-main">
         <TableSelector tables={tables} selectedTableId={selectedTable?.id} onSelect={(table) => { setSelectedTable(table); setNotice(''); }} />
         {(notice || error) && <div className={`pos-alert ${error ? 'pos-alert--error' : ''}`}>{error || notice}<button onClick={error ? loadPos : () => setNotice('')}><RefreshCw size={15} />{error ? 'Retry' : 'Clear'}</button></div>}
@@ -99,11 +310,119 @@ export default function POSPage() {
               <div className="pos-section-heading"><div><span className="eyebrow">MENU</span><h2>{activeCategory === 'all' ? 'All products' : categories.find((category) => category.slug === activeCategory)?.name}</h2></div><span>{filteredProducts.length} products</span></div>
               <div className="product-grid">{filteredProducts.map((product) => <ProductCard key={product.id} product={product} onAdd={addToCart} disabled={!selectedTable} />)}</div>
             </section>
-            <CartSummary items={cart} totals={totals} selectedTable={selectedTable} onIncrease={increase} onDecrease={decrease} onRemove={remove} onSend={sendOrder} submitting={submitting} />
-            <PaymentPanel total={totals.total} />
+            <aside className="pos-right-panel">
+              <CartSummary 
+                items={cart} 
+                totals={totals} 
+                selectedTable={selectedTable} 
+                onIncrease={increase} 
+                onDecrease={decrease} 
+                onRemove={remove} 
+                onSend={sendOrder} 
+                submitting={submitting}
+                appliedCoupon={appliedCoupon}
+                onOpenCouponModal={() => setIsCouponModalOpen(true)}
+                onRemoveCoupon={handleRemoveCoupon}
+              />
+              <div className="pos-right-panel__separator" />
+              <PaymentPanel key={checkoutResetKey} onPay={handlePayment} disabled={!selectedTable || !cart.length} />
+            </aside>
           </section>
         )}
       </main>
+
+      {paymentState !== 'idle' && (
+        <div className="payment-overlay">
+          {paymentState === 'creating' && (
+            <div className="payment-modal">
+              <div className="payment-modal__spinner"></div>
+              <h3>Processing Transaction</h3>
+              <p>Preparing transaction details. Please wait...</p>
+            </div>
+          )}
+
+          {paymentState === 'verifying' && (
+            <div className="payment-modal">
+              <div className="payment-modal__spinner"></div>
+              <h3>Verifying Payment</h3>
+              <p>Confirming transaction signature and sending receipt. Do not close this window...</p>
+            </div>
+          )}
+
+          {paymentState === 'success' && (
+            <div className="payment-modal">
+              <div className="payment-modal__icon payment-modal__icon--success">
+                <CheckCircle2 size={38} />
+              </div>
+              <h3>Payment Successful!</h3>
+              <p>The transaction completed successfully. The tax invoice has been sent to the customer's email.</p>
+              <button className="payment-modal__btn--success" onClick={() => setPaymentState('idle')}>Done</button>
+            </div>
+          )}
+
+          {paymentState === 'failed' && (
+            <div className="payment-modal">
+              <div className="payment-modal__icon payment-modal__icon--failed">
+                <XCircle size={38} />
+              </div>
+              <h3>Payment Failed</h3>
+              <p>{paymentError || 'Something went wrong during payment. Please try again.'}</p>
+              <button className="payment-modal__btn--failed" onClick={() => setPaymentState('idle')}>Close</button>
+            </div>
+          )}
+        </div>
+      )}
+
+      <OrderHistoryModal isOpen={isHistoryOpen} onClose={() => setIsHistoryOpen(false)} />
+
+      {isCouponModalOpen && (
+        <div className="payment-overlay">
+          <div className="payment-modal">
+            <h3>Apply Coupon Code</h3>
+            <p>Enter a valid coupon code to get a discount on this order.</p>
+            <form onSubmit={handleApplyCoupon}>
+              <div className="form-field" style={{ marginBottom: '20px' }}>
+                <div className="form-field__control" style={{ textTransform: 'uppercase' }}>
+                  <input
+                    required
+                    autoFocus
+                    placeholder="e.g. WELCOME10"
+                    value={couponCodeInput}
+                    onChange={(e) => {
+                      setCouponCodeInput(e.target.value.toUpperCase().replace(/\s+/g, ''));
+                      setCouponError('');
+                    }}
+                    style={{ textAlign: 'center', letterSpacing: '0.05em', fontWeight: 'bold' }}
+                  />
+                </div>
+                {couponError && <span className="form-field__error">{couponError}</span>}
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <button
+                  type="button"
+                  className="payment-modal__btn--failed"
+                  onClick={() => {
+                    setIsCouponModalOpen(false);
+                    setCouponCodeInput('');
+                    setCouponError('');
+                  }}
+                  style={{ background: '#eee7df', color: '#49352a' }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="payment-modal__btn--success"
+                  disabled={couponApplying || !couponCodeInput.trim()}
+                  style={{ background: '#547662' }}
+                >
+                  {couponApplying ? 'Applying...' : 'Apply'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </POSLayout>
   );
 }
