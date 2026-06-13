@@ -15,7 +15,7 @@ export default function CashierLayout({ children }) {
   return (
     <div className={`app-shell ${collapsed ? 'sidebar-collapsed' : ''}`}>
       <Sidebar open={sidebarOpen} collapsed={collapsed} onClose={() => setSidebarOpen(false)} onCollapse={() => setCollapsed((value) => !value)} onLogout={handleLogout} />
-      <div className="app-shell__content"><TopNavbar user={user} onMenuClick={() => setSidebarOpen(true)} /><main className="dashboard-main">{children}</main></div>
+      <div className="app-shell__content"><TopNavbar user={user} portalTitle="Velluto Cashier" onLogout={handleLogout} onMenuClick={() => setSidebarOpen(true)} /><main className="dashboard-main">{children}</main></div>
     </div>
   );
 }

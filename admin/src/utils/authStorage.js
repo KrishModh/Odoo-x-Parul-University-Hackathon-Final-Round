@@ -1,5 +1,5 @@
-const TOKEN_KEY = 'crema_pos_token';
-const USER_KEY = 'crema_pos_user';
+const TOKEN_KEY = 'velluto_admin_token';
+const USER_KEY = 'velluto_admin_user';
 
 export const getStoredToken = () => localStorage.getItem(TOKEN_KEY);
 export const getStoredUser = () => {

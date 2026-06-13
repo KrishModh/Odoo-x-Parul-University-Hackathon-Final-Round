@@ -4,6 +4,7 @@ import psycopg
 from psycopg import sql
 from flask_migrate import upgrade
 from flask import Flask
+from sqlalchemy import inspect, text
 
 from ..extensions import db
 from ..services.seed_data import seed_defaults
@@ -65,6 +66,8 @@ def setup_database(app: Flask) -> None:
             # B. Run Migrations
             print("Running database migrations...")
             upgrade()
+            _ensure_user_auth_columns()
+            db.create_all()
 
             # C. Conditional Seed Data (Dev Only)
             is_dev = app.debug or os.getenv('FLASK_DEBUG', 'false').lower() == 'true'
@@ -89,3 +92,26 @@ def setup_database(app: Flask) -> None:
             f.seek(0)
             msvcrt.locking(f.fileno(), msvcrt.LK_UNLCK, 1)
         f.close()
+
+
+def _ensure_user_auth_columns():
+    inspector = inspect(db.engine)
+    try:
+        columns = {column['name'] for column in inspector.get_columns('users')}
+    except Exception:
+        return
+
+    statements = []
+    if 'is_verified' not in columns:
+        statements.append("ALTER TABLE users ADD COLUMN is_verified BOOLEAN NOT NULL DEFAULT false")
+    if 'otp_code' not in columns:
+        statements.append("ALTER TABLE users ADD COLUMN otp_code VARCHAR(6)")
+    if 'otp_expiry' not in columns:
+        statements.append("ALTER TABLE users ADD COLUMN otp_expiry TIMESTAMP WITH TIME ZONE")
+
+    for statement in statements:
+        db.session.execute(text(statement))
+
+    if statements:
+        db.session.execute(text("UPDATE users SET is_verified = true WHERE role IN ('ADMIN', 'KITCHEN')"))
+        db.session.commit()
