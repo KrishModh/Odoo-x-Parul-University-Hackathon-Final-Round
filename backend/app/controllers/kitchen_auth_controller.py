@@ -1,61 +1,47 @@
 import secrets
 import traceback
-from datetime import datetime, timedelta, timezone
-
+from datetime import datetime, timezone
 from flask import jsonify, request
 from flask_jwt_extended import create_access_token, get_jwt_identity
 
 from ..extensions import db
-from ..models import Employee, User, UserRole
+from ..models.kitchen_user import KitchenUser
 from ..services.email_service import send_otp_email
 from ..utils.validators import (
     validate_resend_otp_payload,
     validate_signup_payload,
     validate_verify_otp_payload,
 )
+from .auth_controller import OTP_TTL, OTP_RESEND_COOLDOWN, _build_otp, _utcnow, _resend_available_in
 
-OTP_TTL = timedelta(minutes=5)
-OTP_RESEND_COOLDOWN = timedelta(seconds=60)
-
-
-def signup():
+def kitchen_signup():
     payload = request.get_json(silent=True) or {}
     errors = validate_signup_payload(payload)
     if errors:
         return jsonify({'message': 'Please correct the highlighted fields.', 'errors': errors}), 422
 
     email = payload['email'].strip().lower()
-    existing_user = User.query.filter_by(email=email).first()
+    existing_user = KitchenUser.query.filter_by(email=email).first()
     if existing_user:
         message = 'An account with this email already exists.'
         if not existing_user.is_verified:
             message = 'An account with this email already exists but is still waiting for verification.'
         return jsonify({'message': message, 'requires_verification': not existing_user.is_verified}), 409
 
-    role_str = str(payload.get('role', 'cashier')).strip().lower()
-    if role_str == 'admin':
-        return jsonify({'message': 'Registration of Administrator accounts is not permitted.'}), 403
-    elif role_str == 'kitchen':
-        user_role = UserRole.KITCHEN
-    else:
-        user_role = UserRole.CASHIER
-
     try:
-        user = User(name=payload['name'].strip(), email=email, role=user_role)
+        user = KitchenUser(
+            name=payload['name'].strip(),
+            email=email,
+            role='kitchen',
+            cafe_name=str(payload.get('cafe_name', '')).strip() or 'Velluto Cafe',
+            employee_code=f'KIT-{secrets.token_hex(3).upper()}'
+        )
         user.set_password(payload['password'])
         otp_code, otp_expiry = _build_otp()
         user.otp_code = otp_code
         user.otp_expiry = otp_expiry
+        
         db.session.add(user)
-        db.session.flush()
-
-        prefix = 'KIT' if user_role == UserRole.KITCHEN else 'CSH'
-        employee = Employee(
-            user_id=user.id,
-            cafe_name=str(payload.get('cafe_name', '')).strip() or 'Velluto Cafe',
-            employee_code=f'{prefix}-{secrets.token_hex(3).upper()}',
-        )
-        db.session.add(employee)
         send_otp_email(to=user.email, name=user.name, otp_code=otp_code)
         db.session.commit()
     except Exception as e:
@@ -71,7 +57,7 @@ def signup():
     }), 201
 
 
-def verify_otp():
+def kitchen_verify_otp():
     payload = request.get_json(silent=True) or {}
     errors = validate_verify_otp_payload(payload)
     if errors:
@@ -79,7 +65,7 @@ def verify_otp():
 
     email = payload['email'].strip().lower()
     otp_code = payload['otp_code'].strip()
-    user = User.query.filter_by(email=email).first()
+    user = KitchenUser.query.filter_by(email=email).first()
 
     if not user:
         return jsonify({'message': 'No account was found for that email address.'}), 404
@@ -105,14 +91,14 @@ def verify_otp():
     return jsonify({'message': 'Email verified successfully. You can now log in.'})
 
 
-def resend_otp():
+def kitchen_resend_otp():
     payload = request.get_json(silent=True) or {}
     errors = validate_resend_otp_payload(payload)
     if errors:
         return jsonify({'message': 'Please correct the highlighted fields.', 'errors': errors}), 422
 
     email = payload['email'].strip().lower()
-    user = User.query.filter_by(email=email).first()
+    user = KitchenUser.query.filter_by(email=email).first()
 
     if not user:
         return jsonify({'message': 'No account was found for that email address.'}), 404
@@ -146,7 +132,7 @@ def resend_otp():
     })
 
 
-def login():
+def kitchen_login():
     payload = request.get_json(silent=True) or {}
     email = str(payload.get('email', '')).strip().lower()
     password = str(payload.get('password', ''))
@@ -154,7 +140,7 @@ def login():
     if not email or not password:
         return jsonify({'message': 'Email and password are required.'}), 422
 
-    user = User.query.filter_by(email=email).first()
+    user = KitchenUser.query.filter_by(email=email).first()
     if not user or not user.check_password(password):
         return jsonify({'message': 'The email or password is incorrect.'}), 401
     if not user.is_active:
@@ -166,41 +152,18 @@ def login():
             'email': user.email,
         }), 403
 
-    return jsonify(_auth_response(user, 'Welcome back.'))
+    return jsonify(_kitchen_auth_response(user, 'Welcome back.'))
 
 
-def current_user():
-    user = db.session.get(User, int(get_jwt_identity()))
+def kitchen_current_user():
+    user = db.session.get(KitchenUser, int(get_jwt_identity()))
     if not user:
-        return jsonify({'message': 'User account not found.'}), 404
+        return jsonify({'message': 'Kitchen staff account not found.'}), 404
     data = user.to_dict()
-    data['employee'] = user.employee.to_dict() if user.employee else None
     return jsonify({'user': data})
 
 
-def _auth_response(user, message):
-    token = create_access_token(identity=str(user.id), additional_claims={'role': user.role.value})
+def _kitchen_auth_response(user, message):
+    token = create_access_token(identity=str(user.id), additional_claims={'role': user.role})
     data = user.to_dict()
-    data['employee'] = user.employee.to_dict() if user.employee else None
     return {'message': message, 'access_token': token, 'user': data}
-
-
-def _utcnow():
-    return datetime.now(timezone.utc)
-
-
-def _build_otp(now=None):
-    current_time = now or _utcnow()
-    otp_code = f'{secrets.randbelow(1_000_000):06d}'
-    return otp_code, current_time + OTP_TTL
-
-
-def _resend_available_in(user, now):
-    if not user.otp_expiry:
-        return 0
-
-    sent_at = user.otp_expiry - OTP_TTL
-    next_allowed_at = sent_at + OTP_RESEND_COOLDOWN
-    if next_allowed_at <= now:
-        return 0
-    return int((next_allowed_at - now).total_seconds()) + 1

@@ -13,7 +13,7 @@ import { calculateCartTotals } from '../../utils/money';
 import '../../css/pos/pos.css';
 
 export default function POSPage() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const [tables, setTables] = useState([]);
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
@@ -82,8 +82,13 @@ export default function POSPage() {
     }
   };
 
+  const handleLogout = () => {
+    logout();
+    window.location.assign('/login');
+  };
+
   return (
-    <POSLayout selectedTable={selectedTable} user={user}>
+    <POSLayout selectedTable={selectedTable} user={user} onLogout={handleLogout}>
       <main className="pos-main">
         <TableSelector tables={tables} selectedTableId={selectedTable?.id} onSelect={(table) => { setSelectedTable(table); setNotice(''); }} />
         {(notice || error) && <div className={`pos-alert ${error ? 'pos-alert--error' : ''}`}>{error || notice}<button onClick={error ? loadPos : () => setNotice('')}><RefreshCw size={15} />{error ? 'Retry' : 'Clear'}</button></div>}

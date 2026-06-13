@@ -4,5 +4,6 @@ from .employee import Employee
 from .order import Order, OrderItem, OrderStatus
 from .product import Product
 from .user import User, UserRole
+from .kitchen_user import KitchenUser
 
-__all__ = ['CafeTable', 'Category', 'Employee', 'Order', 'OrderItem', 'OrderStatus', 'Product', 'User', 'UserRole']
+__all__ = ['CafeTable', 'Category', 'Employee', 'Order', 'OrderItem', 'OrderStatus', 'Product', 'User', 'UserRole', 'KitchenUser']
