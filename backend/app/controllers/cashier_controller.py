@@ -1,8 +1,9 @@
+from datetime import datetime, time, timezone, timedelta
 from flask import jsonify
 from flask_jwt_extended import get_jwt_identity
 
 from ..extensions import db
-from ..models import User
+from ..models import User, Order
 
 
 def dashboard():
@@ -40,4 +41,66 @@ def dashboard():
                 {'name': 'Desserts', 'count': 14, 'emoji': '🍰', 'color': '#ead0d0'},
             ],
         },
+    })
+
+
+def orders_history():
+    cashier_id = int(get_jwt_identity())
+    orders = Order.query.filter_by(cashier_id=cashier_id).order_by(Order.created_at.desc()).all()
+    data = []
+    for o in orders:
+        d = o.to_dict()
+        d['item_count'] = sum(item.quantity for item in o.items)
+        data.append(d)
+    return jsonify({'data': data})
+
+
+def orders_stats():
+    cashier_id = int(get_jwt_identity())
+    
+    total_orders = Order.query.filter_by(cashier_id=cashier_id).count()
+    
+    revenue_query = db.session.query(db.func.sum(Order.total)).filter(
+        Order.cashier_id == cashier_id, 
+        Order.payment_status == 'paid'
+    ).scalar()
+    total_revenue = float(revenue_query) if revenue_query else 0.0
+
+    # Local India time alignment (UTC + 5:30)
+    local_now = datetime.now(timezone.utc) + timedelta(hours=5, minutes=30)
+    local_start_of_today_naive = datetime.combine(local_now.date(), time.min)
+    start_of_today_utc = local_start_of_today_naive - timedelta(hours=5, minutes=30)
+    start_of_today_utc = start_of_today_utc.replace(tzinfo=timezone.utc)
+
+    todays_orders = Order.query.filter(
+        Order.cashier_id == cashier_id, 
+        Order.created_at >= start_of_today_utc
+    ).count()
+    
+    todays_revenue_query = db.session.query(db.func.sum(Order.total)).filter(
+        Order.cashier_id == cashier_id,
+        Order.payment_status == 'paid',
+        Order.created_at >= start_of_today_utc
+    ).scalar()
+    todays_revenue = float(todays_revenue_query) if todays_revenue_query else 0.0
+
+    pending_payments = Order.query.filter(
+        Order.cashier_id == cashier_id, 
+        Order.payment_status == 'pending'
+    ).count()
+    
+    paid_orders = Order.query.filter(
+        Order.cashier_id == cashier_id, 
+        Order.payment_status == 'paid'
+    ).count()
+
+    return jsonify({
+        'data': {
+            'total_orders': total_orders,
+            'total_revenue': total_revenue,
+            'todays_orders': todays_orders,
+            'todays_revenue': todays_revenue,
+            'pending_payments': pending_payments,
+            'paid_orders': paid_orders
+        }
     })

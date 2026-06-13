@@ -1,10 +1,14 @@
-const TOKEN_KEY = 'crema_pos_token';
-const USER_KEY = 'crema_pos_user';
+const TOKEN_KEY = 'cashier_token';
+const USER_KEY = 'cashier_user';
+const PENDING_VERIFICATION_KEY = 'velluto_pending_verification';
 
-export const getStoredToken = () => localStorage.getItem(TOKEN_KEY);
+const readStorage = (key) => localStorage.getItem(key) || sessionStorage.getItem(key);
+
+export const getStoredToken = () => readStorage(TOKEN_KEY);
 export const getStoredUser = () => {
   try {
-    return JSON.parse(localStorage.getItem(USER_KEY));
+    const value = readStorage(USER_KEY);
+    return value ? JSON.parse(value) : null;
   } catch {
     return null;
   }
@@ -16,4 +20,17 @@ export const storeSession = (token, user) => {
 export const clearSession = () => {
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(USER_KEY);
+  sessionStorage.removeItem(TOKEN_KEY);
+  sessionStorage.removeItem(USER_KEY);
+  clearPendingVerification();
 };
+export const storePendingVerification = (value) => sessionStorage.setItem(PENDING_VERIFICATION_KEY, JSON.stringify(value));
+export const getPendingVerification = () => {
+  try {
+    const value = sessionStorage.getItem(PENDING_VERIFICATION_KEY);
+    return value ? JSON.parse(value) : null;
+  } catch {
+    return null;
+  }
+};
+export const clearPendingVerification = () => sessionStorage.removeItem(PENDING_VERIFICATION_KEY);

@@ -4,8 +4,12 @@ from .config.settings import Config
 from .extensions import cors, db, jwt, migrate
 from .routes.admin_routes import admin_bp
 from .routes.auth_routes import auth_bp
+from .routes.kitchen_auth_routes import kitchen_auth_bp
 from .routes.cashier_routes import cashier_bp
 from .routes.pos_routes import pos_bp
+from .routes.payment_routes import payment_bp
+from .routes.kitchen_routes import kitchen_bp
+from .routes.coupon_routes import coupon_bp
 from .services.seed_data import seed_defaults
 
 
@@ -19,9 +23,13 @@ def create_app(config_class=Config):
     cors.init_app(app, resources={r'/api/*': {'origins': app.config['CORS_ORIGINS']}})
 
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
+    app.register_blueprint(kitchen_auth_bp, url_prefix='/api/kitchen/auth')
     app.register_blueprint(admin_bp, url_prefix='/api/admin')
     app.register_blueprint(cashier_bp, url_prefix='/api/cashier')
     app.register_blueprint(pos_bp, url_prefix='/api/pos')
+    app.register_blueprint(payment_bp, url_prefix='/api/payments')
+    app.register_blueprint(kitchen_bp, url_prefix='/api/kitchen')
+    app.register_blueprint(coupon_bp, url_prefix='/api/coupons')
 
     register_error_handlers(app)
     register_jwt_handlers()

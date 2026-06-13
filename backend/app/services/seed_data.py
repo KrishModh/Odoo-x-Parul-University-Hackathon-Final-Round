@@ -39,6 +39,7 @@ def seed_defaults(admin_email=None, admin_password=None):
         print(f"Creating default admin account: {admin_email}")
         admin = User(name='Velluto Admin', email=admin_email, role=UserRole.ADMIN)
         admin.set_password(admin_password)
+        admin.is_verified = True
         db.session.add(admin)
         db.session.flush()
         db.session.add(Employee(user_id=admin.id, cafe_name='Velluto Cafe', employee_code='ADM-0001'))
@@ -46,5 +47,8 @@ def seed_defaults(admin_email=None, admin_password=None):
         print(f"Fixing admin role for {admin_email}")
         admin.role = UserRole.ADMIN
         admin.set_password(admin_password)
+        admin.is_verified = True
+    else:
+        admin.is_verified = True
 
     db.session.commit()

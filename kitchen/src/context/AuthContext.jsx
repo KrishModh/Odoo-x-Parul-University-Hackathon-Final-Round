@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { loginUser, signupUser } from '../services/authService';
+import { loginUser, resendOtp, signupUser, verifyOtp } from '../services/authService';
 import { clearSession, getStoredToken, getStoredUser, storeSession } from '../utils/authStorage';
 import AuthContext from './contextStore';
 
@@ -19,11 +19,9 @@ export function AuthProvider({ children }) {
     return data.user;
   };
 
-  const signup = async (details) => {
-    const data = await signupUser(details);
-    authenticate(data);
-    return data.user;
-  };
+  const signup = async (details) => signupUser(details);
+  const confirmOtp = async (payload) => verifyOtp(payload);
+  const requestOtpResend = async (payload) => resendOtp(payload);
 
   const logout = () => {
     clearSession();
@@ -31,6 +29,15 @@ export function AuthProvider({ children }) {
     setUser(null);
   };
 
-  const value = { user, token, isAuthenticated: Boolean(token), login, signup, logout };
+  const value = {
+    user,
+    token,
+    isAuthenticated: Boolean(token),
+    login,
+    signup,
+    confirmOtp,
+    requestOtpResend,
+    logout,
+  };
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

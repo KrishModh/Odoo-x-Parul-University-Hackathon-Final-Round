@@ -5,6 +5,7 @@ import AuthLayout from '../../layouts/AuthLayout';
 import FormField from '../../components/FormField';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { useAuth } from '../../context/useAuth';
+import { storePendingVerification } from '../../utils/authStorage';
 import { roleHome } from '../../utils/roleRedirect';
 import '../../css/auth/auth.css';
 
@@ -12,7 +13,7 @@ export default function LoginPage() {
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login, isAuthenticated, user } = useAuth();
+  const { login, logout, isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -24,8 +25,18 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const loggedInUser = await login(form);
+      if (loggedInUser.role.toLowerCase() !== 'cashier') {
+        logout();
+        setError('Access denied. This portal is reserved for Cashiers only.');
+        return;
+      }
       navigate(location.state?.from?.pathname || roleHome(loggedInUser.role), { replace: true });
     } catch (requestError) {
+      if (requestError.response?.data?.requires_verification) {
+        storePendingVerification({ email: requestError.response.data.email });
+        navigate('/verify-otp', { replace: true, state: { email: requestError.response.data.email } });
+        return;
+      }
       setError(requestError.response?.data?.message || 'Unable to sign in. Please try again.');
     } finally {
       setLoading(false);

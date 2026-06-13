@@ -47,7 +47,7 @@ def create_order():
         order_number=f'POS-{uuid4().hex[:8].upper()}',
         table_id=table_id if db.session.get(CafeTable, table_id) else None,
         cashier_id=int(get_jwt_identity()),
-        status=OrderStatus.CART,
+        status=OrderStatus.SENT_TO_KITCHEN,
         subtotal=subtotal,
         gst=gst,
         total=total,
@@ -66,7 +66,7 @@ def create_order():
         ))
 
     db.session.commit()
-    return jsonify({'message': 'Order saved to cart.', 'data': order.to_dict()}), 201
+    return jsonify({'message': 'Order sent to kitchen.', 'data': order.to_dict()}), 201
 
 
 def _normalize_items(items):
