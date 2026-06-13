@@ -11,8 +11,13 @@ def seed_defaults(admin_email=None, admin_password=None):
             db.session.add(Category(**category))
 
     for table in SAMPLE_TABLES:
-        if not CafeTable.query.filter_by(name=table['name']).first():
-            db.session.add(CafeTable(name=table['name'], seats=table['seats'], status=table['status']))
+        if not CafeTable.query.filter_by(table_name=table['name']).first():
+            db.session.add(CafeTable(
+                table_name=table['name'],
+                seat_capacity=table['seats'],
+                status=table['status'],
+                is_active=True,
+            ))
 
     db.session.flush()
     categories_by_slug = {category.slug: category for category in Category.query.all()}

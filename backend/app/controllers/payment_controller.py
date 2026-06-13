@@ -7,8 +7,8 @@ from flask_jwt_extended import get_jwt_identity
 
 from ..extensions import db
 from ..models import CafeTable, Order, OrderItem, OrderStatus, Coupon
-from ..services.sample_pos_data import calculate_totals, SAMPLE_TABLES
-from .pos_controller import _normalize_items
+from ..services.sample_pos_data import calculate_totals
+from .pos_controller import _normalize_items, deduct_order_inventory
 
 def create_payment_order():
     payload = request.get_json(silent=True) or {}
@@ -31,8 +31,8 @@ def create_payment_order():
         return jsonify({'message': 'Customer phone number is required.'}), 422
 
     # Validate table
-    table_exists = db.session.get(CafeTable, table_id) or any(table['id'] == table_id for table in SAMPLE_TABLES)
-    if not table_exists:
+    table = db.session.get(CafeTable, table_id)
+    if not table or not table.is_active:
         return jsonify({'message': 'Selected table is not available.'}), 422
 
     # Normalize items and calculate total
@@ -100,7 +100,7 @@ def create_payment_order():
         # Create database Order
         order = Order(
             order_number=f'POS-{uuid4().hex[:8].upper()}',
-            table_id=table_id if db.session.get(CafeTable, table_id) else None,
+            table_id=table.id,
             cashier_id=int(get_jwt_identity()),
             status=OrderStatus.CART,
             subtotal=subtotal,
@@ -174,7 +174,7 @@ def verify_payment():
         order = Order.query.filter_by(razorpay_order_id=razorpay_order_id).first()
         if not order:
             return jsonify({'message': 'Associated order was not found in the database.'}), 404
-
+        was_finalized = order.payment_status == 'paid'
         # Fetch payment details from Razorpay to save payment method
         try:
             payment_details = client.payment.fetch(razorpay_payment_id)
@@ -187,9 +187,13 @@ def verify_payment():
         order.payment_method = payment_method
         order.paid_at = datetime.now(timezone.utc)
         order.status = OrderStatus.SENT_TO_KITCHEN
+        stock_error = deduct_order_inventory(order)
+        if stock_error:
+            db.session.rollback()
+            return jsonify({'message': stock_error}), 409
 
         # Increment coupon usage count
-        if order.coupon_code:
+        if order.coupon_code and not was_finalized:
             coupon = Coupon.query.filter_by(code=order.coupon_code).first()
             if coupon:
                 coupon.used_count += 1
@@ -231,8 +235,8 @@ def process_cash_payment():
         return jsonify({'message': 'Customer phone number is required.'}), 422
 
     # Validate table
-    table_exists = db.session.get(CafeTable, table_id) or any(table['id'] == table_id for table in SAMPLE_TABLES)
-    if not table_exists:
+    table = db.session.get(CafeTable, table_id)
+    if not table or not table.is_active:
         return jsonify({'message': 'Selected table is not available.'}), 422
 
     # Normalize items and calculate total
@@ -280,7 +284,7 @@ def process_cash_payment():
         # Create database Order
         order = Order(
             order_number=f'POS-{uuid4().hex[:8].upper()}',
-            table_id=table_id if db.session.get(CafeTable, table_id) else None,
+            table_id=table.id,
             cashier_id=int(get_jwt_identity()),
             status=OrderStatus.SENT_TO_KITCHEN, # Direct to kitchen as it is paid
             subtotal=subtotal,
@@ -309,6 +313,11 @@ def process_cash_payment():
                 unit_price=Decimal(str(item['price'])),
                 line_total=Decimal(str(item['price'])) * item['quantity'],
             ))
+
+        stock_error = deduct_order_inventory(order)
+        if stock_error:
+            db.session.rollback()
+            return jsonify({'message': stock_error}), 409
 
         # Increment coupon usage count
         if validated_coupon_code:

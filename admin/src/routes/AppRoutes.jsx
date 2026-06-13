@@ -11,6 +11,7 @@ export default function AppRoutes() {
       <Route path="/login" element={<LoginPage />} />
       <Route element={<ProtectedRoute roles={['admin']} />}>
         <Route path="/admin" element={<AdminDashboardPage />} />
+        <Route path="/admin/reports" element={<AdminDashboardPage />} />
       </Route>
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
