@@ -79,8 +79,8 @@ def setup_database(app: Flask) -> None:
 
             # C. Conditional Seed Data (Dev Only)
             is_dev = app.debug or os.getenv('FLASK_DEBUG', 'false').lower() == 'true'
-            if is_dev and not Category.query.first():
-                print("Dev mode: Empty DB detected. Seeding defaults...")
+            if is_dev:
+                print("Dev mode: Seeding/updating defaults...")
                 seed_defaults(
                     admin_email=app.config.get('DEFAULT_ADMIN_EMAIL'),
                     admin_password=app.config.get('DEFAULT_ADMIN_PASSWORD')
