@@ -29,6 +29,7 @@ export default function POSPage() {
   const [tables, setTables] = useState([]);
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [selectedTable, setSelectedTable] = useState(null);
   const [activeCategory, setActiveCategory] = useState('all');
   const [cart, setCart] = useState([]);
@@ -80,7 +81,21 @@ export default function POSPage() {
     };
   }, [cart, appliedCoupon]);
 
-  const filteredProducts = useMemo(() => activeCategory === 'all' ? products : products.filter((product) => product.category === activeCategory), [activeCategory, products]);
+  const filteredProducts = useMemo(() => {
+    let result = products;
+    if (activeCategory !== 'all') {
+      result = result.filter((product) => product.category === activeCategory);
+    }
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      result = result.filter((product) => 
+        (product.name || '').toLowerCase().includes(q) || 
+        (product.category || '').toLowerCase().includes(q) ||
+        (product.description || '').toLowerCase().includes(q)
+      );
+    }
+    return result;
+  }, [activeCategory, products, searchQuery]);
 
   const [stats, setStats] = useState(null);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
@@ -353,6 +368,8 @@ export default function POSPage() {
         onOpenHistory={() => setIsHistoryOpen(true)}
         onOpenProfile={() => { setIsProfileModalOpen(true); }}
         onOpenPassword={() => { setIsProfileModalOpen(true); }}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
       >
         <main className="pos-main">
           <TableSelector tables={tables} selectedTableId={selectedTable?.id} onSelect={(table) => { setSelectedTable(table); setNotice(''); }} />
@@ -362,7 +379,14 @@ export default function POSPage() {
               <CategorySidebar categories={categories} activeCategory={activeCategory} onChange={setActiveCategory} />
               <section className="product-section">
                 <div className="pos-section-heading"><div><span className="eyebrow">MENU</span><h2>{activeCategory === 'all' ? 'All products' : categories.find((category) => category.slug === activeCategory)?.name}</h2></div><span>{filteredProducts.length} products</span></div>
-                <div className="product-grid">{filteredProducts.map((product) => <ProductCard key={product.id} product={product} onAdd={addToCart} disabled={!selectedTable} />)}</div>
+                {filteredProducts.length === 0 ? (
+                  <div className="cart-empty" style={{ margin: '16px 0', border: '1px dashed #dccfc2', padding: '60px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                    <strong>No products found</strong>
+                    <span>Try searching for another item or category.</span>
+                  </div>
+                ) : (
+                  <div className="product-grid">{filteredProducts.map((product) => <ProductCard key={product.id} product={product} onAdd={addToCart} disabled={!selectedTable} />)}</div>
+                )}
               </section>
               <aside className="pos-right-panel">
                 <CartSummary 

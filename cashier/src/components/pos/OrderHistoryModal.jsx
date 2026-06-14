@@ -106,6 +106,36 @@ export default function OrderHistoryModal({ isOpen, onClose }) {
     return matchesSearch && matchesStatus;
   });
 
+  const getGroupedOrders = () => {
+    const groups = {};
+    filteredOrders.forEach((order) => {
+      if (!order.created_at) return;
+      const date = new Date(order.created_at);
+      const today = new Date();
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+
+      let groupKey = '';
+      if (date.toDateString() === today.toDateString()) {
+        groupKey = 'Today';
+      } else if (date.toDateString() === yesterday.toDateString()) {
+        groupKey = 'Yesterday';
+      } else {
+        groupKey = new Intl.DateTimeFormat('en-IN', {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric',
+        }).format(date);
+      }
+
+      if (!groups[groupKey]) {
+        groups[groupKey] = [];
+      }
+      groups[groupKey].push(order);
+    });
+    return groups;
+  };
+
   const formatDate = (isoString) => {
     if (!isoString) return '';
     const date = new Date(isoString);
@@ -211,18 +241,11 @@ export default function OrderHistoryModal({ isOpen, onClose }) {
                       <strong>{stats.total_orders}</strong>
                     </div>
                   </div>
-                  <div className="stats-card stats-card--peach">
-                    <div className="stats-card__icon"><Calendar size={18} /></div>
-                    <div className="stats-card__content">
-                      <small>Today's Orders</small>
-                      <strong>{stats.todays_orders}</strong>
-                    </div>
-                  </div>
                   <div className="stats-card stats-card--blue">
-                    <div className="stats-card__icon"><CreditCard size={18} /></div>
+                    <div className="stats-card__icon"><DollarSign size={18} /></div>
                     <div className="stats-card__content">
-                      <small>Today's Sales</small>
-                      <strong>{formatCurrency(stats.todays_revenue)}</strong>
+                      <small>Total Sales</small>
+                      <strong>{formatCurrency(stats.total_revenue)}</strong>
                     </div>
                   </div>
                   <div className="stats-card stats-card--orange">
@@ -230,6 +253,13 @@ export default function OrderHistoryModal({ isOpen, onClose }) {
                     <div className="stats-card__content">
                       <small>Pending Bills</small>
                       <strong>{stats.pending_payments}</strong>
+                    </div>
+                  </div>
+                  <div className="stats-card stats-card--peach">
+                    <div className="stats-card__icon"><AlertCircle size={18} /></div>
+                    <div className="stats-card__content">
+                      <small>Cancelled Orders</small>
+                      <strong>{history.filter(o => o.status === 'cancelled').length}</strong>
                     </div>
                   </div>
                 </div>
@@ -263,9 +293,9 @@ export default function OrderHistoryModal({ isOpen, onClose }) {
               </div>
 
               {/* Orders List */}
-              <div className="history-orders-list">
+              <div className="history-orders-list" style={{ border: 'none', background: 'transparent', padding: 0, gap: '16px', display: 'flex', flexDirection: 'column' }}>
                 {filteredOrders.length === 0 ? (
-                  <div className="history-empty-state">
+                  <div className="history-empty-state" style={{ background: 'white', border: '1px solid #eee7df', borderRadius: '20px', padding: '40px 16px' }}>
                     <AlertCircle size={32} />
                     <strong>No transactions found</strong>
                     <span>
@@ -275,80 +305,114 @@ export default function OrderHistoryModal({ isOpen, onClose }) {
                     </span>
                   </div>
                 ) : (
-                  filteredOrders.map((order) => {
-                    const isCancelled = order.status === 'cancelled';
-                    return (
-                      <div 
-                        key={order.id} 
-                        className={`history-order-row ${isCancelled ? 'history-order-row--cancelled' : ''}`}
-                        style={isCancelled ? { opacity: 0.55, borderLeft: '4px solid #96473e', background: '#fffcfc' } : {}}
-                      >
-                        <div className="history-order-row__main">
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <strong>{order.order_number}</strong>
-                            <span className="history-order-row__table">
-                              {order.table ? order.table.name : 'Takeaway'}
-                            </span>
-                            {order.customer_name && (
-                              <span className="oh-customer-tag">{order.customer_name}</span>
-                            )}
-                          </div>
-                          <small>{formatDate(order.created_at)} · {order.item_count} items</small>
-                        </div>
-
-                        <div className="history-order-row__details" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-                          <div className="history-order-row__amount">
-                            {formatCurrency(order.total)}
-                          </div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px', justifyContent: 'flex-end' }}>
-                            {order.payment_method && (
-                              <span className="history-payment-method">
-                                {order.payment_method.toUpperCase()}
-                              </span>
-                            )}
-                            {isCancelled ? (
-                              <span className="history-status-badge history-status-badge--cancelled" style={{ backgroundColor: '#fff1ee', color: '#96473e', borderColor: '#e9c1bc' }}>
-                                CANCELLED
-                              </span>
-                            ) : (
-                              <span className={`history-status-badge history-status-badge--${order.payment_status}`}>
-                                {order.payment_status.toUpperCase()}
-                              </span>
-                            )}
-                          </div>
-                          {!isCancelled && (order.kitchen_status === 'preparing' || order.kitchen_status === 'completed') ? (
-                            <button
-                              className="coupon-action-btn coupon-action-btn--delete"
-                              disabled
-                              style={{ 
-                                marginTop: '8px', 
-                                padding: '4px 10px', 
-                                fontSize: '0.74rem', 
-                                border: '1px solid #e7e1d8', 
-                                borderRadius: '8px', 
-                                cursor: 'not-allowed', 
-                                background: '#f5f0eb', 
-                                color: '#9c8e84',
-                                display: 'inline-flex',
+                  Object.entries(getGroupedOrders()).map(([groupName, groupOrders]) => (
+                    <div key={groupName} className="history-date-group" style={{ background: 'white', border: '1px solid #eee7df', borderRadius: '20px', overflow: 'hidden' }}>
+                      <div className="history-date-group__header" style={{
+                        background: '#fcfaf7',
+                        padding: '12px 18px',
+                        fontSize: '0.8rem',
+                        fontWeight: '800',
+                        color: '#65574c',
+                        borderBottom: '1px solid #eee7df',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
+                      }}>
+                        <span>{groupName}</span>
+                        <span style={{ fontSize: '0.75rem', color: '#9c8e84', fontWeight: '700' }}>
+                          {groupOrders.length} {groupOrders.length === 1 ? 'transaction' : 'transactions'}
+                        </span>
+                      </div>
+                      <div className="history-date-group__orders" style={{ display: 'grid', alignContent: 'start' }}>
+                        {groupOrders.map((order, index) => {
+                          const isCancelled = order.status === 'cancelled';
+                          return (
+                            <div 
+                              key={order.id} 
+                              className={`history-order-row ${isCancelled ? 'history-order-row--cancelled' : ''}`}
+                              style={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
                                 alignItems: 'center',
-                                gap: '4px'
+                                padding: '15px 16px',
+                                borderBottom: index === groupOrders.length - 1 ? 'none' : '1px solid #f9f6f2',
+                                textGrid: 'left',
+                                transition: 'background 0.15s ease',
+                                borderRadius: '0',
+                                opacity: isCancelled ? 0.55 : 1,
+                                borderLeft: isCancelled ? '4px solid #96473e' : 'none',
+                                background: isCancelled ? '#fffcfc' : 'transparent'
                               }}
                             >
-                              <Lock size={11} /> Kitchen Accepted
-                            </button>
-                          ) : !isCancelled && (
-                            <button
-                              className="coupon-action-btn coupon-action-btn--delete"
-                              onClick={() => confirmCancel(order)}
-                              style={{ marginTop: '8px', padding: '4px 10px', fontSize: '0.74rem', border: '1px solid #f7e6e3', borderRadius: '8px', cursor: 'pointer' }}
-                            >
-                              Cancel Order
-                            </button>
-                          )}
-                        </div>
+                              <div className="history-order-row__main">
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                  <strong>{order.order_number}</strong>
+                                  <span className="history-order-row__table">
+                                    {order.table ? order.table.name : 'Takeaway'}
+                                  </span>
+                                  {order.customer_name && (
+                                    <span className="oh-customer-tag">{order.customer_name}</span>
+                                  )}
+                                </div>
+                                <small>{formatDate(order.created_at)} · {order.item_count} items</small>
+                              </div>
+
+                              <div className="history-order-row__details" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                                <div className="history-order-row__amount">
+                                  {formatCurrency(order.total)}
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px', justifyContent: 'flex-end' }}>
+                                  {order.payment_method && (
+                                    <span className="history-payment-method">
+                                      {order.payment_method.toUpperCase()}
+                                    </span>
+                                  )}
+                                  {isCancelled ? (
+                                    <span className="history-status-badge history-status-badge--cancelled" style={{ backgroundColor: '#fff1ee', color: '#96473e', borderColor: '#e9c1bc' }}>
+                                      CANCELLED
+                                    </span>
+                                  ) : (
+                                    <span className={`history-status-badge history-status-badge--${order.payment_status}`}>
+                                      {order.payment_status.toUpperCase()}
+                                    </span>
+                                  )}
+                                </div>
+                                {!isCancelled && (order.kitchen_status === 'preparing' || order.kitchen_status === 'completed') ? (
+                                  <button
+                                    className="coupon-action-btn coupon-action-btn--delete"
+                                    disabled
+                                    style={{ 
+                                      marginTop: '8px', 
+                                      padding: '4px 10px', 
+                                      fontSize: '0.74rem', 
+                                      border: '1px solid #e7e1d8', 
+                                      borderRadius: '8px', 
+                                      cursor: 'not-allowed', 
+                                      background: '#f5f0eb', 
+                                      color: '#9c8e84',
+                                      display: 'inline-flex',
+                                      alignItems: 'center',
+                                      gap: '4px'
+                                    }}
+                                  >
+                                    <Lock size={11} /> Kitchen Accepted
+                                  </button>
+                                ) : !isCancelled && (
+                                  <button
+                                    className="coupon-action-btn coupon-action-btn--delete"
+                                    onClick={() => confirmCancel(order)}
+                                    style={{ marginTop: '8px', padding: '4px 10px', fontSize: '0.74rem', border: '1px solid #f7e6e3', borderRadius: '8px', cursor: 'pointer' }}
+                                  >
+                                    Cancel Order
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
                       </div>
-                    );
-                  })
+                    </div>
+                  ))
                 )}
               </div>
             </>
