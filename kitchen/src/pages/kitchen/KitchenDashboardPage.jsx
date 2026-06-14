@@ -663,19 +663,6 @@ export default function KitchenDashboardPage() {
         .kds-completed-row__customer { font-size: 0.72rem; color: #9d958e; }
         .kds-ready-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 0.68rem; font-weight: 800; color: #547662; background: #e3eee7; padding: 3px 8px; border-radius: 7px; }
 
-        /* ── Menu grid ── */
-        .kds-menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; margin-top: 16px; }
-        .kds-menu-card { border: 1px solid var(--border); border-radius: 16px; background: white; overflow: hidden; transition: transform 0.18s ease; }
-        .kds-menu-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
-        .kds-menu-card__img { height: 100px; background: #f3ebe3; display: grid; place-items: center; }
-        .kds-menu-card__img img { width: 100%; height: 100%; object-fit: cover; }
-        .kds-menu-card__body { padding: 10px 12px 14px; display: flex; flex-direction: column; gap: 4px; }
-        .kds-menu-card__name { font-size: 0.85rem; font-weight: 700; color: #302b27; }
-        .kds-menu-card__cat { font-size: 0.68rem; color: #9d8e84; background: #f4ede5; padding: 2px 6px; border-radius: 5px; width: fit-content; }
-        .kds-menu-card__price { font-size: 0.9rem; font-weight: 800; color: #49352a; margin-top: 4px; }
-        .kds-menu-card__stock { font-size: 0.68rem; font-weight: 700; }
-        .kds-menu-card__stock--in { color: #547662; }
-        .kds-menu-card__stock--out { color: #b05a50; }
         .kds-cat-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 4px; margin-top: 8px; }
         .kds-cat-chip { border: 1px solid #e7e1d8; background: white; border-radius: 10px; padding: 5px 13px; font-size: 0.76rem; font-weight: 700; color: #7a6e65; cursor: pointer; transition: all 0.18s ease; }
         .kds-cat-chip:hover { background: #f6f0ea; border-color: #cdb8a8; }

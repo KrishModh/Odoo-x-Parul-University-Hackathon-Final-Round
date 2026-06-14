@@ -8,7 +8,7 @@ export default function POSNavbar({ selectedTable, user, onLogout, stats, onOpen
     <header className="pos-navbar">
       <div className="pos-navbar__brand">
         {/* <button className="pos-menu-button"><Menu size={21} /></button> */}
-        <BrandMark title="Velluto Cashier" subtitle="PREMIUM" /></div>
+        <BrandMark title="Velluto Cashier" subtitle="PREMIUM cafe" /></div>
       <label className="pos-search">
         <Search size={18} />
         <input 

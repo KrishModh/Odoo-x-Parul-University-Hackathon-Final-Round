@@ -1,6 +1,6 @@
 import { Coffee } from 'lucide-react';
 
-export default function BrandMark({ compact = false, title = 'Velluto Cafe', subtitle = 'PREMIUM POS' }) {
+export default function BrandMark({ compact = false, title = 'Velluto Cafe', subtitle = 'PREMIUM Cafe' }) {
   return (
     <div className={`brand-mark ${compact ? 'brand-mark--compact' : ''}`}>
       <span className="brand-mark__icon"><Coffee size={22} strokeWidth={2.2} /></span>
