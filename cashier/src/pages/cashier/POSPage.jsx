@@ -31,6 +31,10 @@ export default function POSPage() {
   const [products, setProducts] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTable, setSelectedTable] = useState(null);
+  const [tableSessions, setTableSessions] = useState({});
+  const [customerName, setCustomerName] = useState('');
+  const [customerEmail, setCustomerEmail] = useState('');
+  const [customerPhone, setCustomerPhone] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -102,6 +106,13 @@ export default function POSPage() {
   const [checkoutResetKey, setCheckoutResetKey] = useState(0);
 
   const resetCheckoutFlow = () => {
+    if (selectedTable) {
+      setTableSessions((prev) => {
+        const next = { ...prev };
+        delete next[selectedTable.id];
+        return next;
+      });
+    }
     setCart([]);
     setSelectedTable(null);
     setCheckoutResetKey((prev) => prev + 1);
@@ -109,6 +120,48 @@ export default function POSPage() {
     setError('');
     setPaymentError('');
     setAppliedCoupon(null);
+    setCustomerName('');
+    setCustomerEmail('');
+    setCustomerPhone('');
+  };
+
+  const handleTableChange = (newTable) => {
+    if (selectedTable) {
+      setTableSessions((prev) => ({
+        ...prev,
+        [selectedTable.id]: {
+          cart,
+          appliedCoupon,
+          customerName,
+          customerEmail,
+          customerPhone,
+        }
+      }));
+    }
+
+    if (newTable) {
+      const session = tableSessions[newTable.id] || {
+        cart: [],
+        appliedCoupon: null,
+        customerName: '',
+        customerEmail: '',
+        customerPhone: '',
+      };
+      setCart(session.cart || []);
+      setAppliedCoupon(session.appliedCoupon || null);
+      setCustomerName(session.customerName || '');
+      setCustomerEmail(session.customerEmail || '');
+      setCustomerPhone(session.customerPhone || '');
+    } else {
+      setCart([]);
+      setAppliedCoupon(null);
+      setCustomerName('');
+      setCustomerEmail('');
+      setCustomerPhone('');
+    }
+    
+    setSelectedTable(newTable);
+    setNotice('');
   };
 
   const handleApplyCoupon = async (e) => {
@@ -157,10 +210,39 @@ export default function POSPage() {
     setError('');
     try {
       const data = await fetchPosBootstrap();
+      
+      const isFirstLoad = tables.length === 0;
+      
       setTables(data.tables);
       setCategories(data.categories);
       setProducts(data.products);
-      setSelectedTable((current) => current || data.tables[0] || null);
+      
+      if (isFirstLoad) {
+        const defaultTable = data.tables[0] || null;
+        setSelectedTable(defaultTable);
+        if (defaultTable) {
+          const session = tableSessions[defaultTable.id] || {
+            cart: [],
+            appliedCoupon: null,
+            customerName: '',
+            customerEmail: '',
+            customerPhone: '',
+          };
+          setCart(session.cart || []);
+          setAppliedCoupon(session.appliedCoupon || null);
+          setCustomerName(session.customerName || '');
+          setCustomerEmail(session.customerEmail || '');
+          setCustomerPhone(session.customerPhone || '');
+        }
+      } else {
+        setSelectedTable((current) => {
+          if (current) {
+            const updated = data.tables.find((t) => t.id === current.id);
+            return updated || current;
+          }
+          return null;
+        });
+      }
       await loadStats();
     } catch (requestError) {
       if (showSpinner) setError(requestError.response?.data?.message || 'Unable to load POS session.');
@@ -178,7 +260,7 @@ export default function POSPage() {
     }, 5000);
     
     return () => clearInterval(interval);
-  }, []);
+  }, [tables.length]);
 
   const addToCart = (product) => {
     if (!selectedTable) {
@@ -194,14 +276,26 @@ export default function POSPage() {
     setNotice('');
     setCart((items) => {
       const existing = items.find((item) => item.id === product.id);
+      let updated;
       if (existing) {
         if (existing.quantity >= quantity) {
           setNotice(`Only ${quantity} units of ${product.name} are available in stock.`);
           return items;
         }
-        return items.map((item) => item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item);
+        updated = items.map((item) => item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item);
+      } else {
+        updated = [...items, { id: product.id, name: product.name, price: product.price, quantity: 1 }];
       }
-      return [...items, { id: product.id, name: product.name, price: product.price, quantity: 1 }];
+      
+      setTableSessions((prev) => ({
+        ...prev,
+        [selectedTable.id]: {
+          ...(prev[selectedTable.id] || { customerName: '', customerEmail: '', customerPhone: '', appliedCoupon: null }),
+          cart: updated,
+        }
+      }));
+      
+      return updated;
     });
   };
 
@@ -215,14 +309,54 @@ export default function POSPage() {
         setNotice(`Only ${quantity} units of ${product.name} are available in stock.`);
         return items;
       }
-      return items.map((item) => item.id === id ? { ...item, quantity: item.quantity + 1 } : item);
+      const updated = items.map((item) => item.id === id ? { ...item, quantity: item.quantity + 1 } : item);
+      
+      setTableSessions((prev) => ({
+        ...prev,
+        [selectedTable.id]: {
+          ...(prev[selectedTable.id] || { customerName: '', customerEmail: '', customerPhone: '', appliedCoupon: null }),
+          cart: updated,
+        }
+      }));
+      
+      return updated;
     });
   };
-  const decrease = (id) => setCart((items) => items.flatMap((item) => {
-    if (item.id !== id) return [item];
-    return item.quantity > 1 ? [{ ...item, quantity: item.quantity - 1 }] : [];
-  }));
-  const remove = (id) => setCart((items) => items.filter((item) => item.id !== id));
+
+  const decrease = (id) => setCart((items) => {
+    const updated = items.flatMap((item) => {
+      if (item.id !== id) return [item];
+      return item.quantity > 1 ? [{ ...item, quantity: item.quantity - 1 }] : [];
+    });
+    
+    if (selectedTable) {
+      setTableSessions((prev) => ({
+        ...prev,
+        [selectedTable.id]: {
+          ...(prev[selectedTable.id] || { customerName: '', customerEmail: '', customerPhone: '', appliedCoupon: null }),
+          cart: updated,
+        }
+      }));
+    }
+    
+    return updated;
+  });
+
+  const remove = (id) => setCart((items) => {
+    const updated = items.filter((item) => item.id !== id);
+    
+    if (selectedTable) {
+      setTableSessions((prev) => ({
+        ...prev,
+        [selectedTable.id]: {
+          ...(prev[selectedTable.id] || { customerName: '', customerEmail: '', customerPhone: '', appliedCoupon: null }),
+          cart: updated,
+        }
+      }));
+    }
+    
+    return updated;
+  });
 
   const sendOrder = async () => {
     if (!selectedTable || !cart.length) return;
@@ -372,7 +506,7 @@ export default function POSPage() {
         onSearchChange={setSearchQuery}
       >
         <main className="pos-main">
-          <TableSelector tables={tables} selectedTableId={selectedTable?.id} onSelect={(table) => { setSelectedTable(table); setNotice(''); }} />
+          <TableSelector tables={tables} selectedTableId={selectedTable?.id} onSelect={handleTableChange} tableSessions={tableSessions} />
           {(notice || error) && <div className={`pos-alert ${error ? 'pos-alert--error' : ''}`}>{error || notice}<button onClick={error ? loadPos : () => setNotice('')}><RefreshCw size={15} />{error ? 'Retry' : 'Clear'}</button></div>}
           {loading ? <div className="pos-loader"><LoadingSpinner label="Opening POS session..." /></div> : (
             <section className="pos-workspace">
@@ -403,7 +537,17 @@ export default function POSPage() {
                   onRemoveCoupon={handleRemoveCoupon}
                 />
                 <div className="pos-right-panel__separator" />
-                <PaymentPanel key={checkoutResetKey} onPay={handlePayment} disabled={!selectedTable || !cart.length} />
+                <PaymentPanel 
+                  key={`${selectedTable ? selectedTable.id : 'none'}-${checkoutResetKey}`} 
+                  onPay={handlePayment} 
+                  disabled={!selectedTable || !cart.length}
+                  customerName={customerName}
+                  setCustomerName={setCustomerName}
+                  customerEmail={customerEmail}
+                  setCustomerEmail={setCustomerEmail}
+                  customerPhone={customerPhone}
+                  setCustomerPhone={setCustomerPhone}
+                />
               </aside>
             </section>
           )}

@@ -2,11 +2,17 @@ import { useState } from 'react';
 import { WalletCards, Globe, User, Mail, Phone } from 'lucide-react';
 import FormField from '../FormField';
 
-export default function PaymentPanel({ onPay, disabled }) {
+export default function PaymentPanel({ 
+  onPay, 
+  disabled,
+  customerName,
+  setCustomerName,
+  customerEmail,
+  setCustomerEmail,
+  customerPhone,
+  setCustomerPhone
+}) {
   const [selectedMethod, setSelectedMethod] = useState('cash');
-  const [customerName, setCustomerName] = useState('');
-  const [customerEmail, setCustomerEmail] = useState('');
-  const [customerPhone, setCustomerPhone] = useState('');
   const [errors, setErrors] = useState({});
 
   const validate = () => {
