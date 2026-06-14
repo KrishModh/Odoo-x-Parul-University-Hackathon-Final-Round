@@ -55,7 +55,7 @@ export default function CartSummary({
           <strong>{formatCurrency(appliedCoupon ? totals.final_total : totals.total)}</strong>
         </div>
       </div>
-      <button className="send-kitchen-button" disabled={!selectedTable || !items.length || submitting} onClick={onSend}><Send size={18} />{submitting ? 'Saving order...' : 'Send to Kitchen'}</button>
+      {/* <button className="send-kitchen-button" disabled={!selectedTable || !items.length || submitting} onClick={onSend}><Send size={18} />{submitting ? 'Saving order...' : 'Send to Kitchen'}</button> */}
     </section>
   );
 }

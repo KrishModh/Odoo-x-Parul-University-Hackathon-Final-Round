@@ -6,5 +6,6 @@ from .product import Product
 from .user import User, UserRole
 from .kitchen_user import KitchenUser
 from .coupon import Coupon
+from .notification import Notification
 
-__all__ = ['CafeTable', 'Category', 'Employee', 'Order', 'OrderItem', 'OrderStatus', 'Product', 'User', 'UserRole', 'KitchenUser', 'Coupon']
+__all__ = ['CafeTable', 'Category', 'Employee', 'Order', 'OrderItem', 'OrderStatus', 'Product', 'User', 'UserRole', 'KitchenUser', 'Coupon', 'Notification']

@@ -1,5 +1,5 @@
 from flask import Flask, jsonify
-
+from .routes.kitchen_routes import kitchen_bp 
 from .config.settings import Config
 from .extensions import cors, db, jwt, migrate
 from .routes.admin_routes import admin_bp
@@ -8,8 +8,12 @@ from .routes.kitchen_auth_routes import kitchen_auth_bp
 from .routes.cashier_routes import cashier_bp
 from .routes.pos_routes import pos_bp
 from .routes.payment_routes import payment_bp
-from .routes.kitchen_routes import kitchen_bp
 from .routes.coupon_routes import coupon_bp
+from .routes.notification_routes import notification_bp
+from .routes.reports_routes import reports_bp
+from .routes.order_routes import orders_bp
+from .controllers.pos_controller import get_tables
+from .middleware import roles_required
 from .services.seed_data import seed_defaults
 
 
@@ -30,6 +34,9 @@ def create_app(config_class=Config):
     app.register_blueprint(payment_bp, url_prefix='/api/payments')
     app.register_blueprint(kitchen_bp, url_prefix='/api/kitchen')
     app.register_blueprint(coupon_bp, url_prefix='/api/coupons')
+    app.register_blueprint(notification_bp, url_prefix='/api/notifications')
+    app.register_blueprint(reports_bp, url_prefix='/api/reports')
+    app.register_blueprint(orders_bp, url_prefix='/api/orders')
 
     register_error_handlers(app)
     register_jwt_handlers()
@@ -40,6 +47,8 @@ def create_app(config_class=Config):
     @app.get('/api/health')
     def health_check():
         return jsonify({'status': 'healthy', 'service': 'velluto-cafe-api'})
+
+    app.get('/api/tables')(roles_required('cashier', 'admin')(get_tables))
 
     @app.cli.command('seed')
     def seed_command():

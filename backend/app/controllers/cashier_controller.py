@@ -3,7 +3,7 @@ from flask import jsonify
 from flask_jwt_extended import get_jwt_identity
 
 from ..extensions import db
-from ..models import User, Order
+from ..models import User, Order, OrderStatus
 
 
 def dashboard():
@@ -58,11 +58,15 @@ def orders_history():
 def orders_stats():
     cashier_id = int(get_jwt_identity())
     
-    total_orders = Order.query.filter_by(cashier_id=cashier_id).count()
+    total_orders = Order.query.filter(
+        Order.cashier_id == cashier_id,
+        Order.status != OrderStatus.CANCELLED
+    ).count()
     
     revenue_query = db.session.query(db.func.sum(Order.total)).filter(
         Order.cashier_id == cashier_id, 
-        Order.payment_status == 'paid'
+        Order.payment_status == 'paid',
+        Order.status != OrderStatus.CANCELLED
     ).scalar()
     total_revenue = float(revenue_query) if revenue_query else 0.0
 
@@ -74,24 +78,28 @@ def orders_stats():
 
     todays_orders = Order.query.filter(
         Order.cashier_id == cashier_id, 
-        Order.created_at >= start_of_today_utc
+        Order.created_at >= start_of_today_utc,
+        Order.status != OrderStatus.CANCELLED
     ).count()
     
     todays_revenue_query = db.session.query(db.func.sum(Order.total)).filter(
         Order.cashier_id == cashier_id,
         Order.payment_status == 'paid',
-        Order.created_at >= start_of_today_utc
+        Order.created_at >= start_of_today_utc,
+        Order.status != OrderStatus.CANCELLED
     ).scalar()
     todays_revenue = float(todays_revenue_query) if todays_revenue_query else 0.0
 
     pending_payments = Order.query.filter(
         Order.cashier_id == cashier_id, 
-        Order.payment_status == 'pending'
+        Order.payment_status == 'pending',
+        Order.status != OrderStatus.CANCELLED
     ).count()
     
     paid_orders = Order.query.filter(
         Order.cashier_id == cashier_id, 
-        Order.payment_status == 'paid'
+        Order.payment_status == 'paid',
+        Order.status != OrderStatus.CANCELLED
     ).count()
 
     return jsonify({

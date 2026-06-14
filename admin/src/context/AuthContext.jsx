@@ -3,6 +3,8 @@ import { loginUser, signupUser } from '../services/authService';
 import { clearSession, getStoredToken, getStoredUser, storeSession } from '../utils/authStorage';
 import AuthContext from './contextStore';
 
+const USER_KEY = 'velluto_admin_user';
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(getStoredUser);
   const [token, setToken] = useState(getStoredToken);
@@ -31,6 +33,11 @@ export function AuthProvider({ children }) {
     setUser(null);
   };
 
-  const value = { user, token, isAuthenticated: Boolean(token), login, signup, logout };
+  const refreshUser = (updatedUser) => {
+    localStorage.setItem(USER_KEY, JSON.stringify(updatedUser));
+    setUser(updatedUser);
+  };
+
+  const value = { user, token, isAuthenticated: Boolean(token), login, signup, logout, refreshUser };
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

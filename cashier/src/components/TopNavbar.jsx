@@ -7,7 +7,7 @@ export default function TopNavbar({ user, onMenuClick, onLogout, portalTitle }) 
   return (
     <header className="topbar">
       <div className="topbar__identity">
-        <button className="icon-button topbar__menu" onClick={onMenuClick}><Menu size={22} /></button>
+        {/* <button className="icon-button topbar__menu" onClick={onMenuClick}><Menu size={22} /></button> */}
         <div className="topbar__portal">
           <span className="eyebrow">PORTAL</span>
           <strong>{portalTitle}</strong>

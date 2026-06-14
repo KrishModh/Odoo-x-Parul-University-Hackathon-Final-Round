@@ -19,6 +19,16 @@ class Product(db.Model):
     category = db.relationship('Category', back_populates='products')
 
     def to_dict(self):
+        # Dynamically determine the stock status string
+        if not self.is_active:
+            status_str = "ARCHIVED"
+        elif self.quantity <= 0:
+            status_str = "OUT_OF_STOCK"
+        elif self.quantity <= 5:
+            status_str = "LOW_STOCK"
+        else:
+            status_str = "IN_STOCK"
+
         return {
             'id': self.id,
             'name': self.name,
@@ -26,9 +36,12 @@ class Product(db.Model):
             'description': self.description or '',
             'price': float(self.price or Decimal('0.00')),
             'quantity': self.quantity,
+            'currentStock': self.quantity,
             'category': self.category.slug if self.category else None,
             'category_id': self.category_id,
             'category_name': self.category.name if self.category else None,
-            'stock_status': self.stock_status,
+            'stock_status': status_str,
+            'stockStatus': status_str,
             'is_active': self.is_active,
+            'isAvailable': self.is_active and self.quantity > 0,
         }

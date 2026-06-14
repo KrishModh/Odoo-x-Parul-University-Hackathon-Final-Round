@@ -105,7 +105,7 @@ def kitchen_verify_otp():
         db.session.rollback()
         return jsonify({'message': 'We could not verify your email right now. Please try again.'}), 500
 
-    return jsonify({'message': 'Email verified successfully. You can now log in.'})
+    return jsonify({'message': 'Your account is pending admin approval.', 'pending_approval': True})
 
 
 def kitchen_resend_otp():
@@ -164,13 +164,20 @@ def kitchen_login():
     if not user or not user.check_password(password):
         return jsonify({'message': 'The email or password is incorrect.'}), 401
     if not user.is_active:
-        return jsonify({'message': 'This account has been deactivated.'}), 403
+        return jsonify({'message': 'Your employee account has been deactivated.'}), 403
     if not user.is_verified:
         return jsonify({
             'message': 'Please verify your email before logging in.',
             'requires_verification': True,
             'email': user.email,
         }), 403
+    if user.approval_status == 'pending':
+        return jsonify({'message': 'Your account is waiting for admin approval.'}), 403
+    if user.approval_status == 'rejected':
+        rejection_msg = 'Your account request was rejected.'
+        if user.rejection_reason:
+            rejection_msg += f" Reason: {user.rejection_reason}"
+        return jsonify({'message': rejection_msg}), 403
 
     return jsonify(_kitchen_auth_response(user, 'Welcome back.'))
 
