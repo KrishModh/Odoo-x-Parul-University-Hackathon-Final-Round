@@ -39,6 +39,7 @@ class Order(db.Model):
     coupon_code = db.Column(db.String(32), nullable=True)
     discount_amount = db.Column(db.Numeric(10, 2), nullable=False, default=Decimal('0.00'))
     final_total = db.Column(db.Numeric(10, 2), nullable=False, default=Decimal('0.00'))
+    inventory_deducted = db.Column(db.Boolean, nullable=False, default=False)
 
     table = db.relationship('CafeTable', back_populates='orders')
     items = db.relationship('OrderItem', back_populates='order', cascade='all, delete-orphan')
@@ -70,6 +71,7 @@ class Order(db.Model):
             'kitchen_completed_at': self.kitchen_completed_at.isoformat() if self.kitchen_completed_at else None,
             'items': [item.to_dict() for item in self.items],
             'created_at': self.created_at.isoformat() if self.created_at else None,
+            'inventory_deducted': self.inventory_deducted,
         }
 
 

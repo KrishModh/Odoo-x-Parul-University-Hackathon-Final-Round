@@ -3,6 +3,8 @@ import { loginUser, resendOtp, signupUser, verifyOtp } from '../services/authSer
 import { clearSession, getStoredToken, getStoredUser, storeSession } from '../utils/authStorage';
 import AuthContext from './contextStore';
 
+const USER_KEY = 'cashier_user';
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(getStoredUser);
   const [token, setToken] = useState(getStoredToken);
@@ -29,6 +31,11 @@ export function AuthProvider({ children }) {
     setUser(null);
   };
 
+  const refreshUser = (updatedUser) => {
+    localStorage.setItem(USER_KEY, JSON.stringify(updatedUser));
+    setUser(updatedUser);
+  };
+
   const value = {
     user,
     token,
@@ -38,6 +45,7 @@ export function AuthProvider({ children }) {
     confirmOtp,
     requestOtpResend,
     logout,
+    refreshUser,
   };
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

@@ -5,3 +5,11 @@ export const signupUser = async (details) => (await api.post('/auth/signup', det
 export const verifyOtp = async (payload) => (await api.post('/auth/verify-otp', payload)).data;
 export const resendOtp = async (payload) => (await api.post('/auth/resend-otp', payload)).data;
 export const fetchCurrentUser = async () => (await api.get('/auth/me')).data;
+
+export const fetchProfile = async () => (await api.get('/auth/profile')).data;
+export const updateProfile = async (data) => (await api.patch('/auth/profile', data)).data;
+export const updatePassword = async (data) => (await api.patch('/auth/profile/password', data)).data;
+
+export const forgotPassword = async (data) => (await api.post('/auth/forgot-password', data)).data;
+export const verifyResetOtp = async (data) => (await api.post('/auth/verify-reset-otp', data)).data;
+export const resetPassword = async (data) => (await api.post('/auth/reset-password', data)).data;
