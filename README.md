@@ -1,117 +1,206 @@
 <div align="center">
-
-# ☕ Velluto Cafe POS System
-
-### 🏆 Built for Odoo × Parul University Hackathon — Final Round
-
-[![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
-[![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org/)
-[![Flask](https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
-[![Razorpay](https://img.shields.io/badge/Razorpay-02042B?style=for-the-badge&logo=razorpay&logoColor=3395FF)](https://razorpay.com/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
-[![Theme: Coffee](https://img.shields.io/badge/Theme-Coffee_Premium-4E3629?style=for-the-badge)](#-darklight-theme-system)
-[![Responsive](https://img.shields.io/badge/Responsive-100%25-success?style=for-the-badge)](#-screenshots)
+  
+<img src="https://capsule-render.vercel.app/api?type=waving&color=4E3629&height=200&section=header&text=Velluto%20Cafe%20POS&fontSize=60&fontColor=F5E6D3&fontAlignY=38&desc=☕%20Multi-Portal%20Restaurant%20POS%20Ecosystem&descAlignY=60&descFontColor=D4A574&animation=fadeIn" width="100%"/>
 
 <br/>
+  
+<p>
+  <img src="https://img.shields.io/badge/Odoo%20×%20Parul%20University-Hackathon%20Final%20Round-4E3629?style=for-the-badge&labelColor=D4A574&color=4E3629" />
+</p>
+  
+<p>
+  <img src="https://img.shields.io/badge/React_18-20232A?style=for-the-badge&logo=react&logoColor=61DAFB"/>
+  <img src="https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white"/>
+  <img src="https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Razorpay-02042B?style=for-the-badge&logo=razorpay&logoColor=3395FF"/>
+  <img src="https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Cloudinary-3448C5?style=for-the-badge&logo=cloudinary&logoColor=white"/>
+</p>
+  
+<p>
+  <img src="https://img.shields.io/badge/Portals-3%20Role--Based-D4A574?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/Theme-Coffee%20Premium-4E3629?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/Responsive-100%25-success?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge"/>
+</p>
 
-> **A production-grade, multi-portal Cafe & Restaurant POS ecosystem** built with a decoupled multi-frontend architecture — serving Admin, Cashier, and Kitchen roles through a single secure Flask REST API backed by PostgreSQL.
-
+<br/>
+  
+> ### *"Three portals. One backend. Zero chaos."*
+> A production-grade SaaS Cafe POS ecosystem — built to eliminate the communication gap between front-of-house, kitchen, and management in real cafe environments.
+ 
 <br/>
 
 </div>
 
 ---
 
-## 👥 Team
+<div align="center">
 
-| Role | Name | GitHub |
-|:---|:---|:---|
-| 🧑‍💼 **Team Leader & Full Stack Dev** | Krish Modh | [github.com/KrishModh](https://github.com/KrishModh) |
-| 🎨 **Frontend Developer** | Aakansha Patidar | [github.com/your-link-here](#) |
-| ⚙️ **Backend & Database** | Sahil Khan | [github.com/your-link-here](#) |
+## 👨‍💻 The Team Behind Velluto
 
-> 📌 Replace the `#` placeholders above with actual GitHub profile links.
+</div>
+
+<br/>
+
+<table align="center">
+  <tr>
+    <td align="center" width="280">
+      <a href="https://github.com/KrishModh">
+        <img src="https://github-readme-stats.vercel.app/api?username=KrishModh&show_icons=true&theme=dark&bg_color=1a0e08&title_color=D4A574&text_color=F5E6D3&icon_color=D4A574&border_color=4E3629&hide_border=false&card_width=250" width="250"/>
+      </a>
+      <br/><br/>
+      <a href="https://github.com/KrishModh">
+        <img src="https://img.shields.io/badge/Krish%20Modh-4E3629?style=for-the-badge&logo=github&logoColor=D4A574"/>
+      </a>
+      <br/>
+      <sub><b>🧑‍💼 Team Leader & Full Stack Dev</b></sub>
+      <br/>
+      <sub>Architecture · Auth · Integration · DevOps</sub>
+    </td>
+    <td align="center" width="280">
+      <a href="https://github.com/Aakanshapatidar">
+        <img src="https://github-readme-stats.vercel.app/api?username=Aakanshapatidar&show_icons=true&theme=dark&bg_color=1a0e08&title_color=D4A574&text_color=F5E6D3&icon_color=D4A574&border_color=4E3629&hide_border=false&card_width=250" width="250"/>
+      </a>
+      <br/><br/>
+      <a href="https://github.com/Aakanshapatidar">
+        <img src="https://img.shields.io/badge/Aakansha%20Patidar-4E3629?style=for-the-badge&logo=github&logoColor=D4A574"/>
+      </a>
+      <br/>
+      <sub><b>🎨 Frontend Developer</b></sub>
+      <br/>
+      <sub>UI/UX · React · Animations · Theming</sub>
+    </td>
+    <td align="center" width="280">
+      <a href="https://github.com/sahilkhan145">
+        <img src="https://github-readme-stats.vercel.app/api?username=sahilkhan145&show_icons=true&theme=dark&bg_color=1a0e08&title_color=D4A574&text_color=F5E6D3&icon_color=D4A574&border_color=4E3629&hide_border=false&card_width=250" width="250"/>
+      </a>
+      <br/><br/>
+      <a href="https://github.com/sahilkhan145">
+        <img src="https://img.shields.io/badge/Sahil%20Khan-4E3629?style=for-the-badge&logo=github&logoColor=D4A574"/>
+      </a>
+      <br/>
+      <sub><b>⚙️ Backend & Database Engineer</b></sub>
+      <br/>
+      <sub>Flask API · PostgreSQL · ORM · Migrations</sub>
+    </td>
+  </tr>
+</table>
+
+<br/>
+
+> 🎥 **Demo Video** — [Watch full walkthrough](https://youtu.be/8hALkcVTw6E)
 
 ---
 
+
+
+<div align="center">
+
 ## 📖 Table of Contents
 
-1. [Project Overview](#-project-overview)
-2. [Team](#-team)
-3. [Key Highlights](#-key-highlights)
-4. [Features](#-features)
-5. [Authentication & Security](#-authentication--security)
-6. [Tech Stack](#-tech-stack)
-7. [Folder Structure](#-folder-structure)
-8. [Installation Guide](#-installation-guide)
-9. [Environment Variables](#-environment-variables)
-10. [Demo Accounts](#-demo-accounts)
-11. [Order Flow](#-order-flow)
-12. [API Reference](#-api-reference)
-13. [Future Roadmap](#-future-roadmap)
-14. [License](#-license)
+</div>
+
+<div align="center">
+
+[🌟 Overview](#-project-overview) • [✨ Highlights](#-key-highlights) • [🛠️ Features](#️-features) • [🔒 Security](#-authentication--security) • [💻 Tech Stack](#-tech-stack) • [📂 Structure](#-folder-structure) • [🚀 Setup](#-installation-guide) • [🔑 Env Vars](#-environment-variables) • [👥 Demo](#-demo-accounts) • [🔄 Order Flow](#-order-flow) • [🔌 API](#-api-reference) • [🗺️ Roadmap](#️-future-roadmap)
+
+</div>
 
 ---
 
 ## 🌟 Project Overview
 
-**Velluto Cafe POS** was built to solve a real operational problem — traditional POS systems are single-screen, disconnected, and leave Admins, Cashiers, and Kitchen staff working in silos.
+**Velluto Cafe POS** was built to solve a real operational problem — traditional POS systems are single-screen, disconnected, and leave Admins, Cashiers, and Kitchen staff working in complete silos.
 
-We fixed that by distributing the system across **three purpose-built portals**, all connected to one real-time backend:
+We fixed that by distributing operations across **three purpose-built portals**, all powered by one high-performance backend:
 
 ```mermaid
 graph TD
-    A[🖥️ Admin Dashboard] <-->|Analytics, Inventory, Staff Control| API[⚡ Flask REST API]
-    B[💳 Cashier POS Portal] <-->|Tables, Orders, Payments| API
-    C[🍳 Kitchen Display System] <-->|Live Order Queue & Status| API
-    API <--> D[(🗄️ PostgreSQL Database)]
+    A[🖥️ Admin Dashboard<br/>Port 5174] <-->|Analytics · Inventory · Staff Control| API
+    B[💳 Cashier POS Portal<br/>Port 5173] <-->|Tables · Orders · Payments| API
+    C[🍳 Kitchen Display System<br/>Port 5175] <-->|Live Queue · Prep Status| API
+    API[⚡ Flask REST API<br/>Port 5000] <--> D[(🗄️ PostgreSQL Database)]
 ```
 
-Each portal is tailored to the user's workflow — not a generic screen with hidden tabs.
+Each portal is **purpose-built** for its user — not a generic screen with hidden tabs.
 
 ---
 
 ## ✨ Key Highlights
 
-- 🏗️ **Multi-Frontend Decoupled Architecture** — 3 independent React (Vite) frontends, 1 Flask backend
-- 💳 **Live Razorpay Payment Integration** — checkout, verification, and invoice delivery in one flow
-- 🍳 **Kitchen Display System** — real-time order queue with state transitions and visual alerts
-- 📦 **Smart Inventory Deduction** — stock auto-reduces when orders move through kitchen stages
-- 🔐 **JWT + Role-Based Access** — scoped tokens ensure the right people see the right things
-- 📧 **Automated Email Invoices** — itemized PDF receipts sent via Resend API post-payment
-- 🎨 **Premium Coffee Theme** — dark/light modes with micro-animations and mobile-first UX
+<table>
+  <tr>
+    <td>🏗️</td>
+    <td><b>Multi-Frontend Decoupled Architecture</b></td>
+    <td>3 independent React (Vite) frontends — 1 Flask backend</td>
+  </tr>
+  <tr>
+    <td>💳</td>
+    <td><b>Live Razorpay Payment Integration</b></td>
+    <td>Checkout, signature verification, and invoice in one flow</td>
+  </tr>
+  <tr>
+    <td>🍳</td>
+    <td><b>Kitchen Display System</b></td>
+    <td>Real-time order queue with state transitions and visual alerts</td>
+  </tr>
+  <tr>
+    <td>📦</td>
+    <td><b>Smart Inventory Deduction</b></td>
+    <td>Stock auto-reduces as orders progress through kitchen stages</td>
+  </tr>
+  <tr>
+    <td>🔐</td>
+    <td><b>JWT + Role-Based Access Control</b></td>
+    <td>Scoped tokens — right people see the right portal, always</td>
+  </tr>
+  <tr>
+    <td>📧</td>
+    <td><b>Automated Email Invoices</b></td>
+    <td>Itemized PDF receipts via Resend API post-payment</td>
+  </tr>
+  <tr>
+    <td>🎨</td>
+    <td><b>Premium Coffee Theme Engine</b></td>
+    <td>Dark/light modes · micro-animations · mobile-first UX</td>
+  </tr>
+</table>
 
 ---
 
 ## 🛠️ Features
 
 ### 👑 Admin Panel
+
 | Feature | Description |
 |:---|:---|
-| 📊 Analytics & Reports | Interactive Chart.js graphs — revenue trends, product performance, busy hours |
-| 📦 Inventory Management | Full CRUD with In Stock / Low Stock / Out of Stock tracking |
-| 👥 Staff Approvals | Central portal to authorize Cashier and Kitchen staff registrations |
-| 🎟️ Coupon Engine | Create, modify, delete promotional coupons with percentage discounts and usage caps |
-| 🪟 Table Layout Designer | Virtual table map matching physical cafe layout |
-| 🎨 Appearance Customizer | Toggle dark/light theme system-wide |
+| 📊 **Analytics & Reports** | Interactive Chart.js graphs — revenue trends, product performance, busy hours, avg order duration |
+| 📦 **Inventory Management** | Full CRUD with In Stock / Low Stock / Out of Stock tracking |
+| 👥 **Staff Approvals** | Centralized portal to authorize newly registered Cashier and Kitchen staff |
+| 🎟️ **Coupon Engine** | Create, edit, delete promo coupons with percentage discounts and usage limits |
+| 🪟 **Table Layout Designer** | Map virtual tables matching physical cafe floor plan |
+| 🎨 **Appearance Customizer** | Toggle dark/light theme — syncs system-wide across all portals |
 
 ### 💳 Cashier POS Portal
+
 | Feature | Description |
 |:---|:---|
-| 🪑 Interactive Table Map | Visual grid — empty, dining, and dirty states |
-| 🛒 Instant Cart Manager | Quick search + category filter to build orders fast |
-| 💳 Razorpay Checkout | Dynamic Razorpay payloads for seamless online payment |
-| 📧 Invoice Emails | Resend API delivers itemized PDF receipts to customers |
-| 🔄 Safe Cancellation | Restricted cancellation flow preserving audit logs |
+| 🪑 **Interactive Table Map** | Visual grid — empty, dining, and dirty table states at a glance |
+| 🛒 **Instant Cart Manager** | Search, filter by category, add items and modifiers in seconds |
+| 💳 **Razorpay Checkout** | Dynamic Razorpay payloads for seamless online payment collection |
+| 📧 **Invoice Emails** | Resend API delivers itemized PDF receipts directly to customers |
+| 🔄 **Safe Cancellation System** | Restricted cancellation flow preserving financial audit trails |
 
 ### 🍳 Kitchen Display System (KDS)
+
 | Feature | Description |
 |:---|:---|
-| ⏳ Live Kitchen Queue | Ticket cards sorted by submission time |
-| 🚀 Prep Progression | `To Cook` ➡️ `Cooking` ➡️ `Completed` state transitions |
-| 🔔 Micro-Animations | Visual cues for urgent tickets requiring immediate attention |
-| 📱 Responsive Display | Optimized for wall-mounted monitors, iPads, and tablets |
+| ⏳ **Live Kitchen Queue** | Chronological ticket cards — newest orders never get missed |
+| 🚀 **Prep Progression** | `To Cook` ➡️ `Cooking` ➡️ `Completed` with one tap |
+| 🔔 **Micro-Animations** | Visual urgency cues for tickets needing immediate attention |
+| 📱 **Responsive Grid Display** | Tailored for wall-mounted monitors, iPads, and kitchen tablets |
 
 ---
 
@@ -119,32 +208,73 @@ Each portal is tailored to the user's workflow — not a generic screen with hid
 
 | Layer | Implementation |
 |:---|:---|
-| Token Auth | Stateless JWT with role identifiers (`admin`, `cashier`, `kitchen`) |
-| Password Security | Werkzeug `scrypt` double-pass hashing |
-| Email Verification | 2-factor OTP flow via Resend on new registrations |
-| Endpoint Guards | Custom Flask middleware — `403 Forbidden` on scope mismatch |
+| 🔑 **Token Auth** | Stateless JWT with role identifiers — `admin` · `cashier` · `kitchen` |
+| 🛡️ **Password Security** | Werkzeug `scrypt` double-pass hashing — industry standard |
+| 📧 **Email Verification** | 2-factor OTP flow via Resend on all new registrations |
+| 🔒 **Endpoint Guards** | Custom Flask decorators — `403 Forbidden` on any scope mismatch |
 
 ---
 
 ## 💻 Tech Stack
 
-### Frontend
-- **React 18 + Vite** — fast HMR, component architecture
-- **React Router v6** — role-specific routing
-- **Axios** — JWT auto-attachment via interceptors
-- **Chart.js + React-Chartjs-2** — analytics dashboards
-- **Custom Vanilla CSS** — pixel-perfect coffee-themed UI
-
-### Backend
-- **Python Flask** — Application Factory pattern
-- **Flask-SQLAlchemy + Flask-Migrate** — ORM + Alembic migrations
-- **Flask-JWT-Extended** — token auth
-- **Resend Python SDK** — transactional emails
-
-### Third-Party Services
-- 💳 **Razorpay** — payment gateway
-- ☁️ **Cloudinary** — menu image hosting
-- 📧 **Resend** — email delivery
+<table>
+  <tr>
+    <th>Layer</th>
+    <th>Technology</th>
+    <th>Purpose</th>
+  </tr>
+  <tr>
+    <td rowspan="5"><b>⚛️ Frontend</b></td>
+    <td>React 18 + Vite</td>
+    <td>Fast HMR, component-driven UI</td>
+  </tr>
+  <tr>
+    <td>React Router v6</td>
+    <td>Role-specific portal routing</td>
+  </tr>
+  <tr>
+    <td>Axios + Interceptors</td>
+    <td>JWT auto-attachment on every request</td>
+  </tr>
+  <tr>
+    <td>Chart.js + React-Chartjs-2</td>
+    <td>Admin analytics dashboards</td>
+  </tr>
+  <tr>
+    <td>Custom Vanilla CSS</td>
+    <td>Pixel-perfect coffee-themed UI</td>
+  </tr>
+  <tr>
+    <td rowspan="4"><b>🐍 Backend</b></td>
+    <td>Python Flask</td>
+    <td>Application Factory REST API</td>
+  </tr>
+  <tr>
+    <td>Flask-SQLAlchemy + Migrate</td>
+    <td>ORM + Alembic schema migrations</td>
+  </tr>
+  <tr>
+    <td>Flask-JWT-Extended</td>
+    <td>Stateless token authentication</td>
+  </tr>
+  <tr>
+    <td>Resend Python SDK</td>
+    <td>Transactional email delivery</td>
+  </tr>
+  <tr>
+    <td rowspan="3"><b>☁️ Services</b></td>
+    <td>Razorpay</td>
+    <td>Payment gateway & checkout</td>
+  </tr>
+  <tr>
+    <td>Cloudinary</td>
+    <td>Menu product image hosting</td>
+  </tr>
+  <tr>
+    <td>Resend</td>
+    <td>Invoice & OTP email delivery</td>
+  </tr>
+</table>
 
 ---
 
@@ -152,32 +282,33 @@ Each portal is tailored to the user's workflow — not a generic screen with hid
 
 ```
 Velluto-Cafe-POS/
-├── admin/                     # Admin React Frontend (Port 5174)
+│
+├── 🖥️  admin/                     # Admin React Frontend  →  Port 5174
 │   └── src/
-│       ├── components/        # Metrics, Modals, Navbars
+│       ├── components/             # Metrics cards, Modals, Navbars
 │       ├── pages/
-│       │   ├── admin/         # DashboardPage, ReportsPage
-│       │   └── auth/          # Login, Register, OTP
-│       └── services/          # API service layers
+│       │   ├── admin/              # DashboardPage, ReportsPage
+│       │   └── auth/               # Login, Register, OTP screens
+│       └── services/               # API service layers
 │
-├── cashier/                   # Cashier React Frontend (Port 5173)
+├── 💳  cashier/                    # Cashier React Frontend  →  Port 5173
 │   └── src/
-│       ├── components/        # Table layouts, Cart, Billing
-│       ├── pages/cashier/     # POSPage, CashierDashboard
-│       └── services/          # POS & Payment services
+│       ├── components/             # Table map, Cart, Billing forms
+│       ├── pages/cashier/          # POSPage, CashierDashboard
+│       └── services/               # POS & Payment services
 │
-├── kitchen/                   # Kitchen Display Frontend (Port 5175)
+├── 🍳  kitchen/                    # Kitchen Display Frontend  →  Port 5175
 │   └── src/
-│       └── pages/kitchen/     # KitchenDashboardPage (Live Queue)
+│       └── pages/kitchen/          # KitchenDashboardPage (Live Queue)
 │
-└── backend/                   # Python Flask Backend (Port 5000)
+└── ⚡  backend/                    # Python Flask Backend  →  Port 5000
     └── app/
-        ├── config/            # CORS, JWT, settings
-        ├── controllers/       # Auth, POS, Reports, Kitchen logic
-        ├── models/            # SQLAlchemy models (User, Order, Table)
-        ├── routes/            # Blueprint routing
-        ├── services/          # Razorpay, Cloudinary, Resend adapters
-        └── middleware/        # Role guard decorators
+        ├── config/                 # CORS, JWT, environment settings
+        ├── controllers/            # Auth, POS, Reports, Kitchen logic
+        ├── models/                 # SQLAlchemy models — User, Order, Table
+        ├── routes/                 # Blueprint routing rules
+        ├── services/               # Razorpay, Cloudinary, Resend adapters
+        └── middleware/             # Role guard decorators
 ```
 
 ---
@@ -185,11 +316,12 @@ Velluto-Cafe-POS/
 ## 🚀 Installation Guide
 
 ### Prerequisites
-- Node.js v18+ & npm
-- Python 3.10+
-- PostgreSQL (local or cloud)
 
----
+```
+✅ Node.js v18+  &  npm
+✅ Python 3.10+
+✅ PostgreSQL (local or cloud instance)
+```
 
 ### Step 1 — Clone the Repository
 
@@ -198,9 +330,7 @@ git clone https://github.com/KrishModh/Odoo-x-Parul-University-Hackathon-Final-R
 cd Odoo-x-Parul-University-Hackathon-Final-Round
 ```
 
----
-
-### Step 2 — Setup Backend
+### Step 2 — Backend Setup
 
 ```bash
 cd backend
@@ -215,37 +345,38 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Initialize the database:
+**Initialize & seed the database:**
 
 ```bash
 flask --app run.py db init
 flask --app run.py db migrate -m "initialize schema"
 flask --app run.py db upgrade
-flask --app run.py seed    # Seeds default admin + demo accounts
+flask --app run.py seed        # Creates default admin + demo accounts
 ```
 
-Start the backend:
+**Start the API:**
 
 ```bash
 python run.py
-# API running at: http://localhost:5000
+# ✅ Backend running at: http://localhost:5000
 ```
 
----
+### Step 3 — Frontend Portals
 
-### Step 3 — Run Frontend Portals
-
-Open **3 separate terminals**:
+Open **3 separate terminals** and run:
 
 ```bash
-# Terminal 1 — Cashier Portal (Port 5173)
+# 💳 Terminal 1 — Cashier Portal
 cd cashier && npm install && npm run dev
+# → http://localhost:5173
 
-# Terminal 2 — Admin Dashboard (Port 5174)
+# 🖥️ Terminal 2 — Admin Dashboard
 cd admin && npm install && npm run dev
+# → http://localhost:5174
 
-# Terminal 3 — Kitchen Display (Port 5175)
+# 🍳 Terminal 3 — Kitchen Display
 cd kitchen && npm install && npm run dev
+# → http://localhost:5175
 ```
 
 ---
@@ -255,24 +386,31 @@ cd kitchen && npm install && npm run dev
 ### `backend/.env`
 
 ```env
+# Database
 DATABASE_URL=postgresql+psycopg://postgres:yourpassword@localhost:5432/velluto_cafe
+
+# Auth
 JWT_SECRET_KEY=super-secret-jwt-key-for-velluto-cafe
 DEFAULT_ADMIN_EMAIL=admin@velluto.com
 DEFAULT_ADMIN_PASSWORD=admin123
 
+# Cloudinary (Menu Images)
 CLOUDINARY_CLOUD_NAME=your_cloud_name
 CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_API_SECRET=your_api_secret
 
+# Email (OTP + Invoices)
 RESEND_API_KEY=re_your_resend_api_key
 
+# Payments
 RAZORPAY_KEY_ID=rzp_test_your_key_id
 RAZORPAY_SECRET=your_razorpay_secret
 
+# CORS
 CORS_ORIGINS=http://localhost:5173,http://localhost:5174,http://localhost:5175
 ```
 
-### `admin/.env`, `cashier/.env`, `kitchen/.env`
+### `admin/.env` · `cashier/.env` · `kitchen/.env`
 
 ```env
 VITE_API_BASE_URL=http://localhost:5000/api
@@ -282,123 +420,148 @@ VITE_API_BASE_URL=http://localhost:5000/api
 
 ## 👥 Demo Accounts
 
-After running `flask --app run.py seed`:
+> Run `flask --app run.py seed` first to generate these accounts.
 
-| Portal | Port | Email | Password | Access |
-|:---|:---|:---|:---|:---|
-| **Admin Dashboard** | `5174` | `admin@velluto.com` | `admin123` | Analytics, Inventory, Staff, Coupons |
-| **Cashier POS** | `5173` | `cashier@velluto.com` | `cashier123` | Tables, Orders, Checkout, Refunds |
-| **Kitchen System** | `5175` | `kitchen@velluto.com` | `kitchen123` | Live Queue, Prep Status, Alerts |
+| Portal | Port | Email | Password | Access Scope |
+|:---|:---:|:---|:---|:---|
+| 🖥️ **Admin Dashboard** | `5174` | `admin@velluto.com` | `admin123` | Analytics · Inventory · Staff · Coupons |
+| 💳 **Cashier POS** | `5173` | `cashier@velluto.com` | `cashier123` | Tables · Orders · Checkout · Refunds |
+| 🍳 **Kitchen System** | `5175` | `kitchen@velluto.com` | `kitchen123` | Live Queue · Prep Status · Alerts |
 
 ---
 
 ## 🔄 Order Flow
 
 ```
-[Cashier POS]
-     │  builds cart & submits order
-     ▼
-[Kitchen KDS] ──► status: TO_COOK
-     │  chef starts cooking
-     ▼
-   COOKING ──► inventory auto-deducted
-     │  chef marks complete
-     ▼
-    READY ──► cashier notified, serves table
-     │  customer pays
-     ▼
-[Razorpay / Cash Payment]
-     │  on success
-     ▼
-[Invoice Email Sent via Resend]
-     │
-     ▼
-[Admin Dashboard] ──► Chart.js reports update dynamically
+  ╔══════════════════╗
+  ║   💳 CASHIER POS  ║  ← Selects table, builds cart, submits order
+  ╚════════╤═════════╝
+           │
+           ▼
+  ╔══════════════════╗
+  ║  🍳 KITCHEN KDS  ║  ← Order appears as  [TO COOK]
+  ╚════════╤═════════╝
+           │  Chef starts cooking
+           ▼
+       [COOKING]  ───── 📦 Inventory auto-deducted
+           │  Chef marks complete
+           ▼
+        [READY]   ───── 🔔 Cashier notified
+           │  Customer pays
+           ▼
+  ╔══════════════════════════╗
+  ║  💳 Razorpay / Cash Pay  ║
+  ╚════════╤═════════════════╝
+           │  On success
+           ▼
+  📧 Invoice Email → Customer (via Resend)
+           │
+           ▼
+  ╔══════════════════════╗
+  ║  🖥️ ADMIN DASHBOARD  ║  ← Reports & analytics update dynamically
+  ╚══════════════════════╝
 ```
 
-### Cancellation Rules
+### Cancellation Policy
 
-| State | Can Cancel? | Notes |
-|:---|:---|:---|
-| Cart (not submitted) | ✅ Yes | Update or cancel freely |
-| Cooking | ⚠️ Restricted | Requires cashier authorization |
-| Paid / Served | ❌ No | Must go through refund/void workflow |
+| Order State | Cancellable? | Rule |
+|:---|:---:|:---|
+| 🛒 Cart (not submitted) | ✅ **Yes** | Update or cancel freely |
+| 🍳 Cooking | ⚠️ **Restricted** | Requires cashier authorization |
+| ✅ Paid / Served | ❌ **No** | Must go through refund/void workflow to preserve audit integrity |
+
+---
+
+## 📸 Screenshots
+
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <!-- <img src="https://via.placeholder.com/700x400/1a0e08/D4A574?text=🖥️+Admin+Dashboard" width="100%" style="border-radius:8px"/> -->
+      <img width="2560" height="1440" alt="Screenshot (1740)" src="https://github.com/user-attachments/assets/2ff36f6b-49bc-43a2-a54d-c454ad57e219" />
+      <br/><br/>
+      <b>🖥️ Admin Dashboard</b>
+      <br/>
+      <sub>Analytics, Inventory & Staff Management</sub>
+    </td>
+    <td align="center" width="50%">
+      <!-- <img src="https://via.placeholder.com/700x400/1a0e08/D4A574?text=💳+Cashier+POS+Portal" width="100%" style="border-radius:8px"/> -->
+      <img width="2560" height="1440" alt="Screenshot (1739)" src="https://github.com/user-attachments/assets/d28218da-15f8-4d95-8ba8-9830838c506b" />
+      <br/><br/>
+      <b>💳 Cashier POS Portal</b>
+      <br/>
+      <sub>Table Map, Cart & Razorpay Checkout</sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="50%">
+      <!-- <img src="https://via.placeholder.com/700x400/1a0e08/D4A574?text=🍳+Kitchen+Display+System" width="100%" style="border-radius:8px"/> -->
+      <img width="2560" height="1440" alt="Screenshot (1742)" src="https://github.com/user-attachments/assets/6420cc0c-3819-481f-9985-2f49a74a20de" />
+      <br/><br/>
+      <b>🍳 Kitchen Display System</b>
+      <br/>
+      <sub>Live Order Queue & Prep Status</sub>
+    </td>
+    <td align="center" width="50%">
+      <!-- <img src="https://via.placeholder.com/700x400/1a0e08/D4A574?text=📊+Reports+%26+Analytics" width="100%" style="border-radius:8px"/> -->
+      <img width="2560" height="1440" alt="Screenshot (1741)" src="https://github.com/user-attachments/assets/730978fe-9ebd-4b20-9943-a716480e9356" />
+      <br/><br/>
+      <b>📊 Reports & Analytics</b>
+      <br/>
+      <sub>Revenue Trends & Product Performance</sub>
+    </td>
+  </tr>
+</table>
+
 
 ---
 
 ## 🔌 API Reference
 
-All endpoints prefixed with `/api`.
+> All endpoints prefixed with `/api` · JWT required on protected routes
 
-### Auth — `/api/auth`
-```
-POST   /api/auth/signup          Register new user
-POST   /api/auth/login           Authenticate, receive JWT
-POST   /api/auth/verify-otp      Verify OTP during signup
-POST   /api/auth/forgot-password Trigger password reset flow
-```
+### 🔐 Auth — `/api/auth`
 
-### Admin — `/api/admin`
-```
-GET    /api/admin/products        List all products (Admin only)
-POST   /api/admin/products        Add new product (Admin only)
-PATCH  /api/admin/products/<id>   Update product details
-```
+| Method | Endpoint | Description |
+|:---:|:---|:---|
+| `POST` | `/api/auth/signup` | Register a new user profile |
+| `POST` | `/api/auth/login` | Authenticate & receive JWT access token |
+| `POST` | `/api/auth/verify-otp` | Verify OTP during registration |
+| `POST` | `/api/auth/forgot-password` | Trigger password reset flow |
 
-### POS & Orders — `/api/pos`, `/api/orders`
-```
-GET    /api/pos/tables                    Fetch table map & status
-POST   /api/orders                        Place new order
-POST   /api/payments/razorpay/create      Generate Razorpay order
-POST   /api/payments/razorpay/verify      Verify payment signature
-```
+### 📦 Products — `/api/admin`
+
+| Method | Endpoint | Description |
+|:---:|:---|:---|
+| `GET` | `/api/admin/products` | Fetch all products *(Admin only)* |
+| `POST` | `/api/admin/products` | Add new product *(Admin only)* |
+| `PATCH` | `/api/admin/products/<id>` | Update existing product details |
+
+### 📝 Orders & Tables — `/api/pos` · `/api/orders`
+
+| Method | Endpoint | Description |
+|:---:|:---|:---|
+| `GET` | `/api/pos/tables` | Fetch table map with seating status |
+| `POST` | `/api/orders` | Place a new order with line items |
+| `POST` | `/api/payments/razorpay/create` | Generate a new Razorpay order/invoice |
+| `POST` | `/api/payments/razorpay/verify` | Verify payment signature on success |
 
 ---
 
 ## 🗺️ Future Roadmap
 
-- [ ] 📱 **PWA Support** — offline resilience for Cashier POS
-- [ ] 📲 **QR Code Table Ordering** — customers browse & order from their phones
-- [ ] ⚡ **WebSocket Real-time Updates** — replace HTTP polling in KDS and table map
-- [ ] 🤖 **AI Demand Forecasting** — predict inventory needs from seasonal sales patterns
-- [ ] 📊 **Multi-branch Support** — single admin view across multiple cafe locations
-
----
-
-## 📄 License
-
-Distributed under the **MIT License**.
-
-```
-MIT License
-
-Copyright (c) 2024 Krish Modh, Aakansha Patidar, Sahil Khan
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-```
+- [ ] 📱 **PWA Support** — offline resilience for the Cashier POS
+- [ ] 📲 **QR Code Table Ordering** — customers browse & order from personal devices
+- [ ] ⚡ **WebSocket Real-time** — replace HTTP polling in KDS and table map
+- [ ] 🤖 **AI Demand Forecasting** — predict stock needs from seasonal sales patterns
+- [ ] 📊 **Multi-branch Support** — unified admin view across multiple cafe locations
 
 ---
 
 <div align="center">
 
-**Built with ☕ and late nights at Odoo × Parul University Hackathon**
+<img src="https://capsule-render.vercel.app/api?type=waving&color=4E3629&height=120&section=footer&text=Built%20with%20☕%20at%20Odoo%20×%20Parul%20University%20Hackathon&fontSize=18&fontColor=D4A574&fontAlignY=65&animation=fadeIn" width="100%"/>
 
-*Velluto — Italian for "Velvet". Because great coffee should be smooth.*
+*Velluto — Italian for "Velvet". Because great software, like great coffee, should be smooth.*
 
 </div>
